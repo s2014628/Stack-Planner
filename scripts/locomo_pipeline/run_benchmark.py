@@ -8,16 +8,12 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from src.workflow import run_agent_workflow_async
 from src.utils.logger import logger
-from scripts.locomo_pipeline.data_loader import build_user_query
+from scripts.locomo_pipeline.locomo_workflow import LoComoCentralAgent
 
 
 RUNS_PER_QA = 10
 TEMPERATURE = 0.8
-GRAPH_FORMAT = "locomo"
-MAX_STEP_NUM = 3
-MAX_PLAN_ITERATIONS = 1
 
 
 def set_temperature(temperature: float):
@@ -28,7 +24,8 @@ async def run_single_qa(
     sample: Dict[str, Any],
     run_id: int,
 ) -> Dict[str, Any]:
-    user_query = build_user_query(sample)
+    conversation_history = sample["history"]
+    question = sample["question"]
     sample_id = sample["sample_id"]
     qa_index = sample["qa_index"]
 
@@ -38,30 +35,10 @@ async def run_single_qa(
 
     start_time = time.time()
     try:
-        final_state = await run_agent_workflow_async(
-            user_input=user_query,
-            debug=False,
-            max_plan_iterations=MAX_PLAN_ITERATIONS,
-            max_step_num=MAX_STEP_NUM,
-            enable_background_investigation=False,
-            graph_format=GRAPH_FORMAT,
-        )
-
-        prediction = ""
-        memory_stack_log = []
-
-        if final_state and isinstance(final_state, dict):
-            prediction = final_state.get("final_report", "")
-            memory_stack_raw = final_state.get("memory_stack", None)
-            if memory_stack_raw and isinstance(memory_stack_raw, str):
-                try:
-                    memory_stack_log = json.loads(memory_stack_raw)
-                except json.JSONDecodeError:
-                    memory_stack_log = []
-        elif final_state:
-            if hasattr(final_state, "get"):
-                prediction = final_state.get("final_report", "")
-
+        agent = LoComoCentralAgent()
+        result = agent.run_qa(conversation_history, question)
+        prediction = result.get("prediction", "")
+        memory_stack_log = result.get("memory_stack_log", [])
     except Exception as e:
         logger.error(f"Run failed: sample={sample_id}, qa={qa_index}, run={run_id}: {e}")
         prediction = ""
@@ -94,6 +71,7 @@ async def run_benchmark_for_sample(
         "sample_id": sample["sample_id"],
         "qa_index": sample["qa_index"],
         "category": sample["category"],
+        "history": sample["history"],
         "question": sample["question"],
         "ground_truth": sample["ground_truth"],
         "runs": runs,
@@ -143,7 +121,7 @@ async def run_benchmark_batch(
 
 if __name__ == "__main__":
     import argparse
-    from scripts.locomo_pipeline.data_loader import load_locomo_data, extract_qa_samples
+    from scripts.locomo_pipeline.data_loader import load_locomo_data, extract_qa_samples, build_user_query
 
     parser = argparse.ArgumentParser(description="Run LoCoMo benchmark on Stack-Planner")
     parser.add_argument("--data-path", type=str, required=True, help="Path to locomo10.json")

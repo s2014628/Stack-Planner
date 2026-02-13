@@ -43,7 +43,7 @@ def build_experience_data(
             "sample_id": sample_id,
             "qa_index": qa_index,
             "category": result["category"],
-            "history": result.get("question", ""),
+            "history": result.get("history", ""),
             "question": result["question"],
             "ground_truth": result["ground_truth"],
             "runs": [],
