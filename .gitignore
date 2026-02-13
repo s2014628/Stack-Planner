@@ -42,3 +42,6 @@ shells/*
 .github/
 docs/
 examples/
+
+# Benchmark results (generated data, can be large)
+benchmarks/results/

@@ -18,3 +18,10 @@ BASIC_MODEL:
   base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
   model: "qwen2.5-32b-instruct"
   api_key: sk-789e79d884c1471ba92f610c50038d83
+
+# SUMMARY_MODEL: 用于经验总结的大规模模型 (推荐 DeepSeek)
+# 在 benchmarks 模块中由 SummaryAgent 使用
+# SUMMARY_MODEL:
+#   base_url: https://api.deepseek.com/v1
+#   model: "deepseek-chat"
+#   api_key: your-deepseek-api-key
