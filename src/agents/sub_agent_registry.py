@@ -59,11 +59,27 @@ sub_agents_sp_xxqg = [
 ]
 
 
+sub_agents_locomo = [
+    {
+        "name": SubAgentType.REPORTER.value,
+        "description": "Result organization and answer generation based on conversation context",
+        "node": reporter_node,
+    },
+    # NOTE: Researcher agent designed but commented out for LoCoMo.
+    # Uncomment for benchmarks that need web search / retrieval.
+    # {
+    #     "name": SubAgentType.RESEARCHER.value,
+    #     "description": "Information collection and research from external sources",
+    #     "node": researcher_node,
+    # },
+]
+
+
 def get_sub_agents_by_global_type(graph_type: str):
     """
     根据图类型返回可用的子Agent列表
     Args:
-        graph_type (str): 图类型，例如 "sp" 或 "sp_xxqg"
+        graph_type (str): 图类型，例如 "sp", "sp_xxqg", 或 "locomo"
     Returns:
         List[Dict]: 包含子Agent名称、节点和描述的列表
     """
@@ -71,5 +87,7 @@ def get_sub_agents_by_global_type(graph_type: str):
         return sub_agents_sp
     elif graph_type == "sp_xxqg":
         return sub_agents_sp_xxqg
+    elif graph_type == "locomo":
+        return sub_agents_locomo
     else:
         raise ValueError(f"Unknown graph type: {graph_type}")

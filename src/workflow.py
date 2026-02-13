@@ -58,6 +58,8 @@ async def run_agent_workflow_async(
         from src.graph.builder import sp_xxqg_graph as graph
     elif graph_format == "base":
         from src.graph.builder import base_graph as graph
+    elif graph_format == "locomo":
+        from src.graph.builder import locomo_graph as graph
 
     logger.info(f"Starting async workflow with user input: {user_input}")
     initial_state = {
