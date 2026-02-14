@@ -1,6 +1,13 @@
 import json
 import os
+import random
 from typing import List, Dict, Any, Optional
+
+# LoCoMo Category 5 = 对抗性问题（adversarial）：答案不在对话中，
+# 模型应回答 "no information available" 或 "not mentioned"。
+# 原始数据中 category 5 没有 answer 字段，只有 adversarial_answer（诱导性错误答案）。
+# 参考 LoCoMo 官方评估方式，category 5 的问题被格式化为选择题。
+CATEGORY_5_GROUND_TRUTH = "no information available"
 
 
 def load_locomo_data(data_path: str) -> List[Dict[str, Any]]:
@@ -68,18 +75,42 @@ def extract_qa_samples(
             if categories and category not in categories:
                 continue
 
-            answer = qa.get("answer", "")
-            if answer is None:
-                answer = ""
-            answer = str(answer)
+            question = qa.get("question", "")
+            adversarial_answer = qa.get("adversarial_answer", "")
+
+            if category == 5:
+                # Category 5: 对抗性问题，答案不在对话中。
+                # 参考 LoCoMo 官方评估 (gpt_utils.py)，格式化为选择题：
+                # "Select the correct answer: (a) ... (b) ..."
+                # 随机交换选项顺序，避免位置偏差。
+                answer = CATEGORY_5_GROUND_TRUTH
+                if adversarial_answer:
+                    if random.random() < 0.5:
+                        question = (
+                            f"{question} Select the correct answer: "
+                            f"(a) Not mentioned in the conversation "
+                            f"(b) {adversarial_answer}"
+                        )
+                    else:
+                        question = (
+                            f"{question} Select the correct answer: "
+                            f"(a) {adversarial_answer} "
+                            f"(b) Not mentioned in the conversation"
+                        )
+            else:
+                answer = qa.get("answer", "")
+                if answer is None:
+                    answer = ""
+                answer = str(answer)
 
             sample = {
                 "sample_id": sample_id,
                 "qa_index": qa_idx,
                 "category": category,
                 "history": history,
-                "question": qa.get("question", ""),
+                "question": question,
                 "ground_truth": answer,
+                "adversarial_answer": adversarial_answer if category == 5 else "",
                 "evidence": qa.get("evidence", []),
                 "metadata": {
                     "speaker_a": conversation.get("speaker_a", ""),
