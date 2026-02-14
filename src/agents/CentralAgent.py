@@ -166,7 +166,6 @@ class CentralAgent:
             logger.error("详细错误信息：\n" + traceback.format_exc())
             if retry_count < max_retries - 1:
                 return self.make_decision(state, config, retry_count + 1)
-            # 异常情况下返回默认决策
             end_time = datetime.now()
             time_entry = {
                 "step_name": "central_decision" + start_time.isoformat(),
@@ -175,12 +174,32 @@ class CentralAgent:
                 "duration": (end_time - start_time).total_seconds(),
             }
             global_statistics.add_time_entry(time_entry)
-            return CentralDecision(
-                action=CentralAgentAction.THINK,
-                reasoning="决策解析失败，默认选择思考动作",
-                params={},
-                instruction=self.action_instructions[CentralAgentAction.THINK],
+
+            has_think_history = any(
+                entry.action == "think"
+                for entry in self.memory_stack.get_all()
             )
+            if has_think_history:
+                last_think = ""
+                for entry in reversed(self.memory_stack.get_all()):
+                    if entry.action == "think" and entry.content:
+                        last_think = entry.content
+                        break
+                logger.info("决策解析全部失败，已有THINK历史，fallback到FINISH")
+                return CentralDecision(
+                    action=CentralAgentAction.FINISH,
+                    reasoning=last_think or "决策解析失败，基于已有推理结果完成任务",
+                    params={},
+                    instruction="Task completed (fallback)",
+                )
+            else:
+                logger.info("决策解析全部失败，无THINK历史，fallback到THINK")
+                return CentralDecision(
+                    action=CentralAgentAction.THINK,
+                    reasoning="决策解析失败，默认选择思考动作",
+                    params={},
+                    instruction=self.action_instructions[CentralAgentAction.THINK],
+                )
 
     def _build_decision_prompt(
         self,
