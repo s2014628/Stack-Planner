@@ -231,15 +231,18 @@ class CentralAgent:
             else:
                 converted_messages.append(msg)
 
+        action_options = list(CentralAgentAction)
+        if not self.available_sub_agents:
+            action_options = [
+                a for a in action_options if a != CentralAgentAction.DELEGATE
+            ]
         context = {
-            "available_actions": [action.value for action in CentralAgentAction],
+            "available_actions": [a.value for a in action_options],
             "available_sub_agents": self.available_sub_agents,
             "sub_agents_description": self.sub_agents_description,
             "current_action": "decision",
             "messages_history": converted_messages,
         }
-        action_options = list(CentralAgentAction)
-        # 加载正确的模板名称并合并动作选项
         context_with_actions = {
             **context,
             **config,
