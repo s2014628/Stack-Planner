@@ -9,7 +9,6 @@ from typing import Any, Dict, List
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.utils.logger import logger
-from scripts.locomo_pipeline.data_loader import build_user_query
 
 
 RUNS_PER_QA = 10
@@ -35,12 +34,21 @@ def _get_locomo_graph():
     return locomo_graph
 
 
-async def _run_graph(user_query: str, graph) -> Dict[str, Any]:
+async def _run_graph(
+    conversation_history: str, question: str, graph
+) -> Dict[str, Any]:
+    task_message = (
+        f"Based on the conversation context provided below, "
+        f"answer the following question accurately and concisely.\n\n"
+        f"Question: {question}"
+    )
+
     initial_state = {
-        "messages": [{"role": "user", "content": user_query}],
+        "messages": [{"role": "user", "content": task_message}],
+        "observations": [conversation_history],
         "auto_accepted_plan": True,
         "enable_background_investigation": False,
-        "user_query": user_query,
+        "user_query": task_message,
     }
 
     config = {
@@ -81,7 +89,8 @@ async def run_single_qa(
     run_id: int,
     graph=None,
 ) -> Dict[str, Any]:
-    user_query = build_user_query(sample)
+    conversation_history = sample["history"]
+    question = sample["question"]
     sample_id = sample["sample_id"]
     qa_index = sample["qa_index"]
 
@@ -96,7 +105,7 @@ async def run_single_qa(
         if graph is None:
             graph = _get_locomo_graph()
 
-        result = await _run_graph(user_query, graph)
+        result = await _run_graph(conversation_history, question, graph)
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])
     except Exception as e:
