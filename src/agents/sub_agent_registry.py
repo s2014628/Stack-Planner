@@ -60,11 +60,17 @@ sub_agents_sp_xxqg = [
 
 
 sub_agents_locomo = [
-    {
-        "name": SubAgentType.REPORTER.value,
-        "description": "Result organization and answer generation based on conversation context",
-        "node": reporter_node,
-    },
+    # NOTE: Reporter agent 已禁用 for LoCoMo.
+    # 原因：Reporter 的 prompt 模板面向网络搜索报告生成，不适合对话 QA 任务。
+    # 启用后 reporter 会生成完全无关的内容（如网页爬取结果）。
+    # 对 LoCoMo 场景，CentralAgent 自身的 THINK 推理即可得出答案，
+    # _handle_finish 会直接使用 decision.reasoning 作为最终报告。
+    # 如需恢复，取消注释以下代码：
+    # {
+    #     "name": SubAgentType.REPORTER.value,
+    #     "description": "Result organization and answer generation based on conversation context",
+    #     "node": reporter_node,
+    # },
     # NOTE: Researcher agent designed but commented out for LoCoMo.
     # Uncomment for benchmarks that need web search / retrieval.
     # {
