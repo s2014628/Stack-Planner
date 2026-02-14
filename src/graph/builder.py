@@ -130,6 +130,30 @@ def build_multi_agent_graph():
     return builder.compile()
 
 
+def build_locomo_graph():
+    """
+    构建LoCoMo benchmark专用的状态图。
+    使用CentralAgent的THINK/SUMMARIZE/FINISH流程，不需要网络搜索。
+
+    Returns:
+        编译后的状态图对象
+    """
+    from langgraph.graph import StateGraph, START, END
+
+    builder = StateGraph(State)
+
+    builder.add_node("central_agent", central_agent_node)
+
+    sub_agents = get_sub_agents_by_global_type("locomo")
+    for sub_agent in sub_agents:
+        builder.add_node(sub_agent["name"], sub_agent["node"])
+
+    builder.add_edge(START, "central_agent")
+    builder.add_edge("central_agent", END)
+
+    return builder.compile()
+
+
 def get_next_perception(state: State) -> str:
     wait_stage = state.get("wait_stage", "")
     if wait_stage == "perception":
@@ -209,6 +233,7 @@ def _build_graph_sp_xxqg():
 base_graph = build_graph()
 sp_graph = build_multi_agent_graph()
 xxqg_graph = build_graph_xxqg()
+locomo_graph = build_locomo_graph()
 
 
 def build_graph_with_memory_from_builder(builder):
@@ -229,6 +254,7 @@ _GRAPH_BUILDER_CLASS_MAP = {
     "sp": None,
     "xxqg": None,
     "sp_xxqg": sp_xxqg_graph_builder,
+    "locomo": None,
 }
 
 _GRAPH_CLASS_MAP = {
@@ -236,6 +262,7 @@ _GRAPH_CLASS_MAP = {
     "sp": {"memory": None, "no_memory": sp_graph},
     "xxqg": {"memory": None, "no_memory": xxqg_graph},
     "sp_xxqg": {"memory": None, "no_memory": sp_xxqg_graph_builder.compile()},
+    "locomo": {"memory": None, "no_memory": locomo_graph},
 }
 
 
