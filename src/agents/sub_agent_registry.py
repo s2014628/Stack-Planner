@@ -12,7 +12,7 @@ class SubAgentType(Enum):
 
 from src.graph.sp_nodes import (
     researcher_node,
-    coder_node,
+    # coder_node,  # 已禁用 coder 子代理
     reporter_node,
     researcher_xxqg_node,
     reporter_xxqg_node,
@@ -26,11 +26,11 @@ sub_agents_sp = [
         "description": "Information collection and research",
         "node": researcher_node,
     },
-    {
-        "name": SubAgentType.CODER.value,
-        "description": "Code generation and execution for math or code problems",
-        "node": coder_node,
-    },
+    # {  # 已禁用 coder 子代理
+    #     "name": SubAgentType.CODER.value,
+    #     "description": "Code generation and execution for math or code problems",
+    #     "node": coder_node,
+    # },
     {
         "name": SubAgentType.REPORTER.value,
         "description": "Result organization and report generation",

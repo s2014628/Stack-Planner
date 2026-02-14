@@ -14,7 +14,7 @@ from src.config.agents import AGENT_LLM_MAP
 from src.llms.llm import get_llm_by_type
 from src.memory import MemoryStack, MemoryStackEntry
 from src.prompts.template import apply_prompt_template, get_prompt_template
-from src.utils.json_utils import repair_json_output
+from src.utils.json_utils import repair_json_output, extract_json_from_text
 from src.utils.logger import logger
 from src.utils.statistics import global_statistics
 from src.prompts.central_decision import Decision, DelegateParams
@@ -121,11 +121,12 @@ class CentralAgent:
         try:
             llm = get_llm_by_type(
                 AGENT_LLM_MAP.get("central_agent", "default")
-            ).with_structured_output(
-                Decision,
-                method="json_mode",
             )
-            response = llm.invoke(messages)
+            raw_response = llm.invoke(messages)
+
+            # 从响应中提取 JSON（兼容 <think> 标签、自然语言前缀、markdown 代码块）
+            raw_json = extract_json_from_text(raw_response.content)
+            response = Decision.model_validate_json(raw_json)
 
             # 解析决策结果
             action = CentralAgentAction(response.action)

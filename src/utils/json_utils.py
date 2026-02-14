@@ -3,7 +3,61 @@
 
 from src.utils.logger import logger
 import json
+import re
 import json_repair
+
+
+def extract_json_from_text(content: str) -> str:
+    """
+    Extract JSON from LLM output that may contain <think> tags,
+    natural language text, or markdown code blocks around the JSON.
+
+    Args:
+        content: Raw LLM output string
+
+    Returns:
+        Extracted JSON string
+    """
+    if not content:
+        return content
+
+    # Strip <think>...</think> tags (qwen3 etc.)
+    content = re.sub(r"<think>[\s\S]*?</think>", "", content).strip()
+
+    # Extract from markdown code blocks
+    code_block_match = re.search(r"```(?:json|ts)?\s*\n?([\s\S]*?)```", content)
+    if code_block_match:
+        extracted = code_block_match.group(1).strip()
+        if extracted:
+            return extracted
+
+    # Find outermost JSON object {...} via brace matching
+    start_idx = content.find("{")
+    if start_idx != -1:
+        depth = 0
+        in_string = False
+        escape_next = False
+        for i in range(start_idx, len(content)):
+            ch = content[i]
+            if escape_next:
+                escape_next = False
+                continue
+            if ch == "\\" and in_string:
+                escape_next = True
+                continue
+            if ch == '"':
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    return content[start_idx : i + 1]
+
+    return content
 
 
 def repair_json_output(content: str) -> str:
