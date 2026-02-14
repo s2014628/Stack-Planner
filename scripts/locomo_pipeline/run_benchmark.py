@@ -37,9 +37,14 @@ def _get_locomo_graph():
 async def _run_graph(
     conversation_history: str, question: str, graph
 ) -> Dict[str, Any]:
+    # NOTE: 对话历史放在 observations 中（通过系统 prompt 注入），不放在 messages 中。
+    # 原因：如果把长对话放进 messages，LLM 会把它当作直接问答任务，
+    # 返回自然语言答案而非 Decision JSON，导致 make_decision 解析失败。
+    # observations 在 decision 阶段通过模板 "Task Context Information" 展示，
+    # 在 THINK 阶段通过 "Current Progress" 展示。
     task_message = (
-        f"Based on the conversation context provided below, "
-        f"answer the following question accurately and concisely.\n\n"
+        f"Based on the conversation context provided in the system information, "
+        f"answer the following question:\n\n"
         f"Question: {question}"
     )
 
