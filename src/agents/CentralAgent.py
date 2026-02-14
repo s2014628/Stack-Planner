@@ -538,49 +538,51 @@ class CentralAgent:
 
         final_report = state.get("final_report", None)
         if not final_report:
-            logger.info("未找到最终报告，委派Reporter Agent生成报告...")
+            if "reporter" in self.available_sub_agents:
+                logger.info("未找到最终报告，委派Reporter Agent生成报告...")
 
-            # 记录委派动作到记忆栈
-            memory_entry = MemoryStackEntry(
-                timestamp=datetime.now().isoformat(),
-                action="delegate",
-                agent_type="reporter",
-                content="未生成最终报告，委派Reporter Agent生成最终报告",
-            )
-            self.memory_stack.push(memory_entry)
+                memory_entry = MemoryStackEntry(
+                    timestamp=datetime.now().isoformat(),
+                    action="delegate",
+                    agent_type="reporter",
+                    content="未生成最终报告，委派Reporter Agent生成最终报告",
+                )
+                self.memory_stack.push(memory_entry)
 
-            # 构建Reporter执行上下文
-            delegation_context = {
-                "task_description": "根据所有收集到的信息生成完整的最终报告",
-                "agent_type": "reporter",
-                "memory_context": self.memory_stack.get_summary(
-                    include_full_history=True
-                ),
-                "original_query": state.get("user_query", ""),
-                "report_type": "final_report",
-                "execution_history": [
-                    entry.to_dict() for entry in self.memory_stack.get_all()
-                ],
-            }
-
-            logger.info("central_delegate_reporter: 委派Reporter Agent生成最终报告")
-            return Command(
-                update={
-                    "messages": [
-                        AIMessage(
-                            content="委派Reporter Agent生成最终报告",
-                            name="central_delegate_reporter",
-                        )
-                    ],
-                    "delegation_context": delegation_context,
-                    "current_node": "central_agent",
-                    "memory_stack": json.dumps(
-                        [entry.to_dict() for entry in self.memory_stack.get_all()]
+                delegation_context = {
+                    "task_description": "根据所有收集到的信息生成完整的最终报告",
+                    "agent_type": "reporter",
+                    "memory_context": self.memory_stack.get_summary(
+                        include_full_history=True
                     ),
-                    "pending_finish": True,  # 标记等待报告完成后再finish
-                },
-                goto="reporter",
-            )
+                    "original_query": state.get("user_query", ""),
+                    "report_type": "final_report",
+                    "execution_history": [
+                        entry.to_dict() for entry in self.memory_stack.get_all()
+                    ],
+                }
+
+                logger.info("central_delegate_reporter: 委派Reporter Agent生成最终报告")
+                return Command(
+                    update={
+                        "messages": [
+                            AIMessage(
+                                content="委派Reporter Agent生成最终报告",
+                                name="central_delegate_reporter",
+                            )
+                        ],
+                        "delegation_context": delegation_context,
+                        "current_node": "central_agent",
+                        "memory_stack": json.dumps(
+                            [entry.to_dict() for entry in self.memory_stack.get_all()]
+                        ),
+                        "pending_finish": True,
+                    },
+                    goto="reporter",
+                )
+            else:
+                logger.info("Reporter不可用，使用decision reasoning作为最终报告")
+                final_report = decision.reasoning
         logger.info(f"final_report: {final_report}")
 
         # 构建执行摘要（包含完整记忆栈历史）
@@ -610,3 +612,28 @@ class CentralAgent:
 
         logger.info(report_msg)
         logger.info(global_statistics.get_statistics())
+
+        memory_entry = MemoryStackEntry(
+            timestamp=datetime.now().isoformat(),
+            action="finish",
+            agent_type="central_agent",
+            content=f"任务完成: {final_report[:200] if final_report else ''}",
+        )
+        self.memory_stack.push(memory_entry)
+
+        return Command(
+            update={
+                "messages": [
+                    AIMessage(
+                        content=report_msg,
+                        name="central_finish",
+                    )
+                ],
+                "final_report": final_report,
+                "current_node": "central_agent",
+                "memory_stack": json.dumps(
+                    [entry.to_dict() for entry in self.memory_stack.get_all()]
+                ),
+            },
+            goto="__end__",
+        )
