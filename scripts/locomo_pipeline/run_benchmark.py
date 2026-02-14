@@ -38,14 +38,20 @@ async def _run_graph(
     conversation_history: str, question: str, graph
 ) -> Dict[str, Any]:
     task_message = (
-        f"Based on the conversation context provided below, "
-        f"answer the following question accurately and concisely.\n\n"
+        f"[TASK FOR CENTRAL AGENT]\n"
+        f"A user needs you to answer a question based on a conversation history. "
+        f"Use your decision framework (THINK/REFLECT/SUMMARIZE/DELEGATE/FINISH) to process this task. "
+        f"Do NOT answer the question directly - follow the decision protocol.\n\n"
+        f"=== CONVERSATION HISTORY ===\n{conversation_history}\n"
+        f"=== END CONVERSATION ===\n\n"
         f"Question: {question}"
     )
 
     initial_state = {
         "messages": [{"role": "user", "content": task_message}],
-        "observations": [conversation_history],
+        "observations": [
+            f"Conversation context loaded. Need to answer: {question}"
+        ],
         "auto_accepted_plan": True,
         "enable_background_investigation": False,
         "user_query": task_message,
