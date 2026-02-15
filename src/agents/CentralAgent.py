@@ -61,8 +61,11 @@ class CentralAgent:
     并最终整合结果生成完成报告
     """
 
+    MAX_DECISION_ITERATIONS = 10
+
     def __init__(self, graph_format: str = "sp"):
         self.memory_stack = MemoryStack()
+        self._decision_count = 0
         from src.agents.SubAgentManager import SubAgentManager
 
         self.sub_agent_manager = SubAgentManager(self)
@@ -110,8 +113,23 @@ class CentralAgent:
             决策结果对象
         """
         max_retries = 3
-        logger.info("中枢Agent正在进行决策...")
+        self._decision_count += 1
+        logger.info(f"中枢Agent正在进行决策... (第{self._decision_count}次)")
         start_time = datetime.now()
+
+        if self._decision_count > self.MAX_DECISION_ITERATIONS:
+            logger.warning(f"决策次数超过上限({self.MAX_DECISION_ITERATIONS})，强制FINISH")
+            last_content = ""
+            for entry in reversed(self.memory_stack.get_all()):
+                if entry.content:
+                    last_content = entry.content
+                    break
+            return CentralDecision(
+                action=CentralAgentAction.FINISH,
+                reasoning=last_content or "决策迭代次数超限，基于已有信息完成任务",
+                params={},
+                instruction="Task completed (max iterations reached)",
+            )
 
         # 构建决策prompt
         messages = self._build_decision_prompt(state, config)
@@ -164,6 +182,30 @@ class CentralAgent:
                 f"决策解析失败:  (尝试 {retry_count + 1}/{max_retries}): {str(e)}"
             )
             logger.error("详细错误信息：\n" + traceback.format_exc())
+
+            raw_content = ""
+            try:
+                raw_content = raw_response.content if raw_response else ""
+            except Exception:
+                pass
+
+            if raw_content and "{" not in raw_content and len(raw_content) > 20:
+                logger.info("LLM返回了自然语言回答而非Decision JSON，直接作为FINISH处理")
+                end_time = datetime.now()
+                time_entry = {
+                    "step_name": "central_decision" + start_time.isoformat(),
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "duration": (end_time - start_time).total_seconds(),
+                }
+                global_statistics.add_time_entry(time_entry)
+                return CentralDecision(
+                    action=CentralAgentAction.FINISH,
+                    reasoning=raw_content,
+                    params={},
+                    instruction="Task completed (direct answer detected)",
+                )
+
             if retry_count < max_retries - 1:
                 return self.make_decision(state, config, retry_count + 1)
             end_time = datetime.now()
@@ -193,12 +235,12 @@ class CentralAgent:
                     instruction="Task completed (fallback)",
                 )
             else:
-                logger.info("决策解析全部失败，无THINK历史，fallback到THINK")
+                logger.info("决策解析全部失败，无THINK历史，fallback到FINISH with empty reasoning")
                 return CentralDecision(
-                    action=CentralAgentAction.THINK,
-                    reasoning="决策解析失败，默认选择思考动作",
+                    action=CentralAgentAction.FINISH,
+                    reasoning=raw_content or "决策解析失败，无法获取有效回答",
                     params={},
-                    instruction=self.action_instructions[CentralAgentAction.THINK],
+                    instruction="Task completed (fallback)",
                 )
 
     def _build_decision_prompt(
@@ -304,17 +346,26 @@ class CentralAgent:
         messages = apply_prompt_template("central_agent", state, extra_context=context)
 
         llm = get_llm_by_type(AGENT_LLM_MAP.get("central_agent", "default"))
-        response = llm.invoke(messages)
+        try:
+            response = llm.invoke(messages)
+            think_content = response.content
+        except Exception as e:
+            logger.error(f"THINK LLM调用失败: {e}")
+            think_content = decision.reasoning or "思考过程执行失败"
+
+        if len(think_content) > 3000:
+            logger.warning(f"THINK输出过长({len(think_content)}字符)，截断到3000字符")
+            think_content = think_content[:3000]
 
         # 记录思考过程到记忆栈
         memory_entry = MemoryStackEntry(
             timestamp=datetime.now().isoformat(),
             action="think",
-            content=response.content,
+            content=think_content,
         )
         self.memory_stack.push(memory_entry)
 
-        logger.info(f"central_think: {response.content}")
+        logger.info(f"central_think: {think_content[:200]}")
         end_time = datetime.now()
         time_entry = {
             "step_name": "central_think" + start_time.isoformat(),
@@ -325,7 +376,7 @@ class CentralAgent:
         global_statistics.add_time_entry(time_entry)
         return Command(
             update={
-                "messages": [AIMessage(content=response.content, name="central_think")],
+                "messages": [AIMessage(content=think_content, name="central_think")],
                 "current_node": "central_agent",
                 "memory_stack": json.dumps(
                     [entry.to_dict() for entry in self.memory_stack.get_all()]
@@ -552,6 +603,42 @@ class CentralAgent:
             goto=agent_type,
         )
 
+    def _extract_concise_answer(
+        self, reasoning: str, state: State
+    ) -> str:
+        """
+        从长篇reasoning中提取简洁答案。
+        当没有reporter可用时，使用LLM从推理内容中提取短答案。
+        """
+        if not reasoning:
+            return ""
+
+        user_query = state.get("user_query", "")
+
+        extraction_prompt = (
+            "Based on the following analysis and context, extract ONLY the final short answer. "
+            "Your response must be ONLY the answer itself - a few words or a short phrase. "
+            "Do NOT include any explanation, reasoning, or analysis.\n\n"
+        )
+        if user_query:
+            extraction_prompt += f"Original question: {user_query}\n\n"
+        extraction_prompt += f"Analysis:\n{reasoning[:2000]}\n\n"
+        extraction_prompt += "Short answer:"
+
+        try:
+            llm = get_llm_by_type(AGENT_LLM_MAP.get("central_agent", "basic"))
+            response = llm.invoke([
+                {"role": "system", "content": "You are a concise answer extractor. Output ONLY the short answer, nothing else."},
+                {"role": "user", "content": extraction_prompt},
+            ])
+            answer = response.content.strip()
+            if answer:
+                return answer
+        except Exception as e:
+            logger.error(f"答案提取失败: {e}")
+
+        return reasoning
+
     def _handle_finish(
         self, decision: CentralDecision, state: State, config: RunnableConfig
     ) -> Command:
@@ -603,8 +690,10 @@ class CentralAgent:
                     goto="reporter",
                 )
             else:
-                logger.info("Reporter不可用，使用decision reasoning作为最终报告")
-                final_report = decision.reasoning
+                logger.info("Reporter不可用，尝试从reasoning中提取简洁答案")
+                final_report = self._extract_concise_answer(
+                    decision.reasoning, state
+                )
         logger.info(f"final_report: {final_report}")
 
         # 构建执行摘要（包含完整记忆栈历史）

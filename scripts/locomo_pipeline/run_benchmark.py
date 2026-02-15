@@ -43,9 +43,11 @@ async def _run_graph(
     # observations 在 decision 阶段通过模板 "Task Context Information" 展示，
     # 在 THINK 阶段通过 "Current Progress" 展示。
     task_message = (
-        f"Based on the conversation context provided in the system information, "
-        f"answer the following question:\n\n"
-        f"Question: {question}"
+        f"You must respond with a Decision JSON object. "
+        f"Analyze the conversation context in the system information and determine your action. "
+        f"The question to answer is: {question}\n\n"
+        f"IMPORTANT: Your response MUST be a JSON object with fields: action, reasoning, params, instruction, locale. "
+        f"Do NOT answer the question directly. Choose an action (think/finish) and put your analysis in the reasoning field."
     )
 
     initial_state = {
@@ -63,7 +65,7 @@ async def _run_graph(
             "max_step_num": 3,
             "mcp_settings": {},
         },
-        "recursion_limit": 100,
+        "recursion_limit": 30,
     }
 
     final_state = None
