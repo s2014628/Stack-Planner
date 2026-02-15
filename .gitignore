@@ -42,3 +42,4 @@ shells/*
 .github/
 docs/
 examples/
+results/locomo/prepared_samples.json

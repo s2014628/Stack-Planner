@@ -10,6 +10,8 @@
       {
         "run_id": 1,
         "prediction": "The conversation history provided in the system information includes detailed logs of multiple sessions between Caroline and Melanie. In Session 1, the very first message from Caroline (D1:3) states: 'I went to a LGBTQ support group yesterday and it was so powerful.' The session is timestamped as '1:56 pm on 8 May, 2023'. Therefore, Caroline attended the LGBTQ support group on May 7, 2023. The information is directly available and sufficient to answer the user's question without needing further analysis, delegation, or summarization.",
+        "f1_score": 0.08,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T00:59:23.650000",
@@ -19,12 +21,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 22.57,
-        "timestamp": "2026-02-15T00:59:23.655176"
+        "elapsed_seconds": 22.57
       },
       {
         "run_id": 2,
         "prediction": "The conversation history clearly indicates that Caroline attended an LGBTQ support group on May 7, 2023. In Session 1, dated May 8, 2023 at 1:56 pm, Caroline states: 'I went to a LGBTQ support group yesterday and it was so powerful.' Since 'yesterday' relative to May 8, 2023 is May 7, 2023, the answer is directly available from the provided context. No further analysis, delegation, or reflection is needed as the information is sufficient and unambiguous.",
+        "f1_score": 0.0845,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T00:59:47.736732",
@@ -34,12 +37,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 24.08,
-        "timestamp": "2026-02-15T00:59:47.739534"
+        "elapsed_seconds": 24.08
       },
       {
         "run_id": 3,
         "prediction": "The conversation context from Session 1 (1:56 pm on 8 May, 2023) shows that Caroline mentioned going to an LGBTQ support group 'yesterday' relative to that conversation. The timestamp of Session 1 is explicitly provided as '1:56 pm on 8 May, 2023'. Therefore, Caroline went to the LGBTQ support group on May 7, 2023. The current information is sufficient to answer the question directly without needing to delegate to any sub-agent for further information gathering.",
+        "f1_score": 0.0833,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:00:09.515870",
@@ -49,12 +53,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 21.79,
-        "timestamp": "2026-02-15T01:00:09.529630"
+        "elapsed_seconds": 21.79
       },
       {
         "run_id": 4,
         "prediction": "The user's question is a specific factual query that can be answered directly from the provided conversation context. By examining Session 1 of the conversation history, I can see that Caroline mentioned in message [D1:3]: 'I went to a LGBTQ support group yesterday and it was so powerful.' This message was sent on 'Session 1 (1:56 pm on 8 May, 2023)'. Since she said 'yesterday', this means she attended the LGBTQ support group on May 7, 2023. The information is complete and sufficient to answer the question without needing to delegate to any sub-agents or perform additional analysis.",
+        "f1_score": 0.0659,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:00:19.701903",
@@ -64,12 +69,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 10.17,
-        "timestamp": "2026-02-15T01:00:19.704683"
+        "elapsed_seconds": 10.17
       },
       {
         "run_id": 5,
         "prediction": "The conversation context clearly provides the information needed to answer the question. In Session 1 (1:56 pm on 8 May, 2023), Caroline states: 'I went to a LGBTQ support group yesterday and it was so powerful.' This indicates she attended the support group on May 7, 2023 (the day before the conversation on May 8, 2023). No further analysis or delegation is required as the answer is directly available in the provided context.",
+        "f1_score": 0.0909,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:00:26.221050",
@@ -79,12 +85,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 6.52,
-        "timestamp": "2026-02-15T01:00:26.222290"
+        "elapsed_seconds": 6.52
       },
       {
         "run_id": 6,
         "prediction": "The task is to answer the question: 'When did Caroline go to the LGBTQ support group?' Based on the provided conversation context, specifically Session 1, we can see that Caroline mentions attending an LGBTQ support group in message [D1:3]: 'I went to a LGBTQ support group yesterday and it was so powerful.' Session 1 is timestamped as '1:56 pm on 8 May, 2023'. Since she went 'yesterday' relative to this conversation, we can determine that Caroline went to the LGBTQ support group on May 7, 2023. All necessary information is directly available in the provided context, and no further analysis, delegation, or information gathering is required. The answer is complete and satisfies the user's query.",
+        "f1_score": 0.0571,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:00:44.670529",
@@ -94,12 +101,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 18.46,
-        "timestamp": "2026-02-15T01:00:44.681803"
+        "elapsed_seconds": 18.46
       },
       {
         "run_id": 7,
         "prediction": "The question asks: 'When did Caroline go to the LGBTQ support group?' Based on the conversation context provided, specifically Session 1 (1:56 pm on 8 May, 2023), in message [D1:3], Caroline states: 'I went to a LGBTQ support group yesterday and it was so powerful.' Since the session timestamp is 1:56 pm on 8 May 2023, and she refers to the event happening 'yesterday,' we can determine that Caroline attended the LGBTQ support group on 7 May 2023. The available information in the memory history is sufficient and directly answers the question. No further reasoning, reflection, summarization, or delegation to sub-agents is required. Therefore, the FINISH action is appropriate.",
+        "f1_score": 0.0612,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:01:03.203556",
@@ -109,12 +117,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 18.52,
-        "timestamp": "2026-02-15T01:01:03.204471"
+        "elapsed_seconds": 18.52
       },
       {
         "run_id": 8,
         "prediction": "The question 'When did Caroline go to the LGBTQ support group?' can be answered directly from the conversation context provided. In Session 1 (1:56 pm on 8 May, 2023), Caroline explicitly states in message D1:3: 'I went to a LGBTQ support group yesterday.' This indicates she attended the support group on May 7, 2023 (the day before May 8, 2023). All necessary information is present in the provided context, and no further analysis, reflection, summarization, or delegation is required. The answer is complete and satisfies the user's query.",
+        "f1_score": 0.075,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:01:21.898643",
@@ -124,12 +133,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 18.72,
-        "timestamp": "2026-02-15T01:01:21.920980"
+        "elapsed_seconds": 18.72
       },
       {
         "run_id": 9,
         "prediction": "The question asks: 'When did Caroline go to the LGBTQ support group?' By examining the conversation history, specifically Session 1, I can see that Caroline mentions this event in [D1:3]: 'I went to a LGBTQ support group yesterday and it was so powerful.' The timestamp for Session 1 is '1:56 pm on 8 May, 2023.' Since she says she went 'yesterday,' the event occurred on May 7, 2023. The information is directly available in the provided context, and no further research, summarization, or delegation is needed. The task requirements are fully satisfied with this answer.",
+        "f1_score": 0.069,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:01:29.740733",
@@ -139,12 +149,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 7.82,
-        "timestamp": "2026-02-15T01:01:29.742966"
+        "elapsed_seconds": 7.82
       },
       {
         "run_id": 10,
         "prediction": "The question 'When did Caroline go to the LGBTQ support group?' can be directly answered from the provided conversation context. In Session 1 (D1:3), Caroline states: 'I went to a LGBTQ support group yesterday and it was so powerful.' This message is timestamped as '1:56 pm on 8 May, 2023'. Therefore, Caroline went to the LGBTQ support group on May 7, 2023 (the day before the conversation). The information is sufficient and explicit in the provided context, requiring no further delegation or analysis.",
+        "f1_score": 0.08,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:01:36.722791",
@@ -154,10 +165,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 6.98,
-        "timestamp": "2026-02-15T01:01:36.724976"
+        "elapsed_seconds": 6.98
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -170,6 +183,8 @@
       {
         "run_id": 1,
         "prediction": "# Python_Projects\n\nMy python projects\n\n## [Project 1: The Blackjack Game](https://github.com/raedshomali/Python_Projects/tree/main/The%20Blackjack%20Game)\n\n## [Project 2: The Higher Lower Game](https://github.com/raedshomali/Python_Projects/tree/main/The%20Higher%20Lower%20Game)\n\n## [Project 3: The Caesar Cipher](https://github.com/raedshomali/Python_Projects/tree/main/The%20Caesar%20Cipher)\n\n## [Project 4: The Secret Auction](https://github.com/raedshomali/Python_Projects/tree/main/The%20Secret%20Auction)\n\n## [Project 5: The Calculator](https://github.com/raedshomali/Python_Projects/tree/main/The%20Calculator)\n\n## [Project 6: The Guess the Number](https://github.com/raedshomali/Python_Projects/tree/main/The%20Guess%20the%20Number)\n\n## [Project 7: The Hangman](https://github.com/raedshomali/Python_Projects/tree/main/The%20Hangman)\n\n## [Project 8: The Password Generator](https://github.com/raedshomali/Python_Projects/tree/main/The%20Password%20Generator)\n\n## [Project 9: The Rock Paper Scissors](https://github.com/raedshomali/Python_Projects/tree/main/The%20Rock%20Paper%20Scissors)\n\n## [Project 10: The Treasure Island](https://github.com/raedshomali/Python_Projects/tree/main/The%20Treasure%20Island)\n\n## [Project 11: The Tip Calculator](https://github.com/raedshomali/Python_Projects/tree/main/The%20Tip%20Calculator)\n\n## [Project 12: The Band Name Generator](https://github.com/raedshomali/Python_Projects/tree/main/The%20Band%20Name%20Generator)",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:02:18.727994",
@@ -193,12 +208,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 1321.08,
-        "timestamp": "2026-02-15T01:23:37.811522"
+        "elapsed_seconds": 1321.08
       },
       {
         "run_id": 2,
         "prediction": "The conversation history contains sufficient information to answer the question directly. In Session 1, message D1:14, Melanie states: 'Yeah, I painted that lake sunrise last year!' This indicates she painted a sunrise scene last year (relative to the conversation date of May 8, 2023). No additional information gathering or analysis is required as the answer is explicitly stated in the provided context.",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:23:56.496249",
@@ -208,12 +224,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 18.69,
-        "timestamp": "2026-02-15T01:23:56.498759"
+        "elapsed_seconds": 18.69
       },
       {
         "run_id": 3,
         "prediction": "## Assignment 4 - File Sharing Application\r\n\r\nThis is a simple file-sharing application implemented in Python using sockets for network communication. The application allows users to connect to a server, view available files, and download them.\r\n\r\n### Features\r\n\r\n- **Server**: Hosts files in a specified directory and listens for client connections.\r\n- **Client**: Connects to the server, lists available files, and downloads selected files.\r\n- **Multiple Clients**: The server can handle multiple clients concurrently using threading.\r\n\r\n### Requirements\r\n\r\n- Python 3.x\r\n- No external libraries required\r\n\r\n### How to Run\r\n\r\n#### Server\r\n\r\n1. Ensure the server has a directory named `server_files` containing the files to share.\r\n2. Run the server script:\r\n   ```bash\r\n   python server.py\r\n   ```\r\n3. The server will start listening on `localhost:5000`.\r\n\r\n#### Client\r\n\r\n1. Run the client script:\r\n   ```bash\r\n   python client.py\r\n   ```\r\n2. Enter the server's IP address (default: `localhost`) and port (default: `5000`).\r\n3. Follow the on-screen prompts to list files and download them.\r\n\r\n### Code Structure\r\n\r\n- **`server.py`**: Contains the server logic, including handling client connections and file transfers.\r\n- **`client.py`**: Contains the client logic, including connecting to the server and downloading files.\r\n- **`server_files/`**: Directory where the server stores files to share.\r\n- **`client_downloads/`**: Directory where the client saves downloaded files.\r\n\r\n### Usage\r\n\r\n1. Start the server.\r\n2. Start one or more clients.\r\n3. In the client, use the menu to:\r\n   - List available files on the server.\r\n   - Download a file by entering its name.\r\n   - Exit the application.\r\n\r\n### Example Interaction\r\n\r\n```\r\nClient:\r\nEnter server IP [localhost]: \r\nEnter server port [5000]: \r\nConnected to server.\r\n\r\n1. List files\r\n2. Download file\r\n3. Exit\r\nEnter choice: 1\r\nAvailable files:\r\n- file1.txt\r\n- file2.jpg\r\n\r\nEnter choice: 2\r\nEnter filename to download: file1.txt\r\nDownloading file1.txt...\r\nFile downloaded successfully.\r\n```\r\n\r\n### Notes\r\n\r\n- The server can handle multiple clients simultaneously.\r\n- Downloaded files are saved in the `client_downloads` directory.\r\n- Ensure the server's `server_files` directory exists and contains files to share.",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:39:35.158590",
@@ -230,12 +247,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 1378.04,
-        "timestamp": "2026-02-15T01:46:54.540272"
+        "elapsed_seconds": 1378.04
       },
       {
         "run_id": 4,
         "prediction": "Based on the conversation history, Melanie painted a sunrise over a lake last year. In Session 1, message D1:14, she says: 'Yeah, I painted that lake sunrise last year! It's special to me.' This directly answers the question about when she painted a sunrise. The information is clear, specific, and sufficient to provide a complete answer without needing further analysis or delegation to sub-agents.",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:47:13.287849",
@@ -245,12 +263,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 18.75,
-        "timestamp": "2026-02-15T01:47:13.290148"
+        "elapsed_seconds": 18.75
       },
       {
         "run_id": 5,
         "prediction": "Looking through the conversation history, I need to find when Melanie painted a sunrise. Let me search through the 19 sessions systematically.\n\nFirst, I should search for keywords: \"sunrise\", \"paint\", \"Melanie\", \"painted\". Let me scan each session:\n\n- Session 1: Melanie shares a photo of a painting of a sunset over a lake (D1:12). Caroline asks if it's her painting (D1:13), and Melanie says: \"Yeah, I painted that lake sunrise last year! It's special to me.\" (D1:14)\n\nThis is the key reference! In Session 1, Dialogue 14, Melanie explicitly states she painted a \"lake sunrise last year.\" The conversation took place on \"8 May, 2023\" (Session 1 timestamp).\n\nSo Melanie painted the sunrise **last year** relative to May 8, 2023, which would be sometime in **2022**.\n\nTo answer the question \"When did Melanie paint a sunrise?\" - based on the conversation, she painted it **last year** (which would be 2022), and she mentioned this during her conversation with Caroline on May 8, 2023.\n\nLet me verify there are no other references to Melanie painting a sunrise in other sessions:\n- Session 8: Melanie shares a painting of a sunset with a palm tree (D8:6) - this is a sunset, not sunrise\n- Session 9: Caroline shares a painting with a bright sun (D9:14) - but this is Caroline's painting\n- Session 14: Caroline paints a sunset (D14:5, D14:7) - Caroline's work\n- Other sessions mention various paintings but not specifically a sunrise by Melanie\n\nThe only direct reference is in Session 1, where Melanie confirms she painted the lake sunrise shown in the photo.",
+        "f1_score": 0.0088,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T01:47:55.410658",
@@ -267,19 +286,21 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 1193.9,
-        "timestamp": "2026-02-15T02:07:07.187965"
+        "elapsed_seconds": 1193.9
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 22.75,
-        "timestamp": "2026-02-15T02:07:29.942080"
+        "elapsed_seconds": 22.75
       },
       {
         "run_id": 7,
         "prediction": "The conversation history provides sufficient information to answer the question directly without needing to delegate to any sub-agents. By examining the dialogue, I found that in Session 1 (May 8, 2023), Melanie mentions painting a lake sunrise in [D1:14]: 'Yeah, I painted that lake sunrise last year! It's special to me.' This indicates she painted the sunrise one year prior to May 2023, which would be in 2022. The information is clear and complete, allowing me to provide the answer: Melanie painted the sunrise in 2022.",
+        "f1_score": 0.0256,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T02:07:49.633043",
@@ -289,12 +310,13 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 19.69,
-        "timestamp": "2026-02-15T02:07:49.634783"
+        "elapsed_seconds": 19.69
       },
       {
         "run_id": 8,
         "prediction": "**Strategic Analysis Framework**\n\n* **Current Situation Assessment**:  \n  The user asks a specific factual question about the timeline of an event mentioned in the provided multi-session dialogue history. The question is: \"When did Melanie paint a sunrise?\" I have access to the full transcript of 19 sessions between Caroline and Melanie, spanning from May to October 2023, with detailed timestamps and shared image descriptions. My current action is `think`, meaning I must analyze the context thoroughly before deciding on the next action (e.g., `finish` to answer).\n\n* **Problem Decomposition**:  \n  1. **Primary Objective**: Locate all instances in the conversation where Melanie mentions painting a sunrise.\n  2. **Secondary Objective**: Extract the specific temporal reference (e.g., a date, a relative time like \"last year\") associated with that event.\n  3. **Verification Objective**: Cross-check any other relevant mentions to ensure accuracy and consistency.\n  4. **Answer Formulation**: Synthesize the extracted information into a clear, concise answer to the question.\n\n* **Resource Evaluation**:  \n  - **Available Data**: The entire conversation history is loaded in the `Current Progress`. It is structured by sessions with dates and message identifiers (e.g., `[D1:14]`).\n  - **Available Tools**: My own reasoning and text analysis capabilities. There are no sub-agents listed (`Available Sub-Agents: `), so I cannot delegate. I must perform the analysis and answer directly.\n  - **Information Sufficiency**: The context appears comprehensive for answering this question, as the dialogue is rich with personal sharing and references to past activities.\n\n* **Risk and Constraint Analysis**:  \n  - **Risk of Ambiguity**: The question says \"a sunrise,\" but Melanie might have painted multiple sunrises or described a painting in a way that is ambiguous (e.g., \"sunset over a lake\" might be confused with sunrise). I must be precise.\n  - **Constraint of Time Reference**: The conversation provides relative time references (e.g., \"last year,\" \"last week\") anchored to specific session dates. I must map these to absolute years or dates.\n  - **Potential for Misinterpretation**: I must distinguish between Melanie sharing a *photo* of a painting and stating when she *painted* it.\n\n* **Strategic Planning**:  \n  1. **Step 1 - Targeted Search**: Systematically scan the conversation history, focusing on messages from Melanie that contain the keywords \"paint,\" \"sunrise,\" \"sunset,\" \"lake,\" and \"last year.\"\n  2. **Step 2 - Context Extraction**: When a relevant message is found, examine the surrounding dialogue to confirm the subject (painting a sunrise) and extract the time reference.\n  3. **Step 3 - Corroboration**: Check if the same event is referenced elsewhere to solidify the timeline.\n  4. **Step 4 - Inference & Answer**: If a specific date isn't given, infer the year from the relative time and the session date.\n  5. **Step 5 - Action Decision**: Determine if the information is sufficient to provide a final answer. If yes, proceed to `finish`.\n\n**Key Focus Areas**\n\n* **Goal Clarification**: The goal is not to interpret the painting's meaning but to pinpoint *when* the act of painting the sunrise occurred. The answer should be a point in time (e.g., a year, a season, a specific date if available).\n\n* **Approach Selection**: A linear, manual review of the sessions is the most reliable method given the structured data. I will start from Session 1, as early sessions often establish shared history.\n\n* **Resource Allocation**: This is a straightforward information retrieval task. I am the sole agent capable of parsing the text. No delegation is needed.\n\n* **Timeline and Dependencies**: The analysis is a single, self-contained step. The dependency is solely on the accuracy of my text search.\n\n* **Success Criteria**: A successful outcome is the identification of the exact message(s) where Melanie states she painted a sunrise and the derivation of a clear time answer from it.\n\n**Analysis Execution & Findings**\n\nI will now perform the targeted search through the sessions.\n\n1.  **Session 1 (8 May 2023)**:\n    *   `[D1:12] Melanie`: ...`[shared image: a photo of a painting of a sunset over a lake]` *(This is a sunset, not a sunrise, but is relevant context)*.\n    *   `[D1:14] Melanie`: \"Yeah, I painted that lake sunrise last year! It's special to me.\" **<- CRITICAL HIT**.\n    *   **Interpretation**: Melanie corrects Caroline's assumption. The painting is of a **lake sunrise**, not a sunset. She painted it **\"last year.\"** The session date is May 2023. Therefore, \"last year\" refers to **2022**.\n\n2.  **Corroborative Scan (Sessions 2-19)**:\n    *   A rapid scan of subsequent sessions reveals no other mention of Melanie painting a *sunrise*. She discusses many other paintings (sunsets, horses, abstract art, pottery) and often shares images, but the \"lake sunrise\" from Session 1 is the only direct reference to a sunrise painting and its creation time.\n\n**Conclusion and Next Steps**\n\n*   **Specific Observation**: The only explicit reference to Melanie painting a sunrise is found in Session 1, message `[D1:14]`.\n*   **Conclusion**: Melanie painted the lake sunrise in **2022**. A more precise date (e.g., month or day) is not provided in the conversation context.\n*   **Information Sufficiency**: The information is **sufficient** to answer the question. The context provides a clear relative timestamp (\"last year\") anchored to a known session date.\n*   **Recommendation**: Proceed to the `finish` action. Since no reporter sub-agent is available, I will provide the final answer directly within the `finish` reasoning output, stating that Melanie painted the sunrise in 2022.\n\n**Final Strategic Decision**: The analysis is complete. The next action should be `finish`.",
+        "f1_score": 0.0028,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T02:09:10.529377",
@@ -311,24 +333,28 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 2194.2,
-        "timestamp": "2026-02-15T02:44:23.835945"
+        "elapsed_seconds": 2194.2
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 25.75,
-        "timestamp": "2026-02-15T02:44:49.583585"
+        "elapsed_seconds": 25.75
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.94,
-        "timestamp": "2026-02-15T02:45:01.523551"
+        "elapsed_seconds": 11.94
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -341,74 +367,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.39,
-        "timestamp": "2026-02-15T02:45:11.932305"
+        "elapsed_seconds": 10.39
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 123.85,
-        "timestamp": "2026-02-15T02:47:15.780666"
+        "elapsed_seconds": 123.85
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 161.14,
-        "timestamp": "2026-02-15T02:49:56.921386"
+        "elapsed_seconds": 161.14
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 150.21,
-        "timestamp": "2026-02-15T02:52:27.132615"
+        "elapsed_seconds": 150.21
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 27.03,
-        "timestamp": "2026-02-15T02:52:54.160680"
+        "elapsed_seconds": 27.03
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.57,
-        "timestamp": "2026-02-15T02:53:06.727171"
+        "elapsed_seconds": 12.57
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T02:53:15.395240"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 121.27,
-        "timestamp": "2026-02-15T02:55:16.668741"
+        "elapsed_seconds": 121.27
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 185.56,
-        "timestamp": "2026-02-15T02:58:22.226180"
+        "elapsed_seconds": 185.56
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 18.95,
-        "timestamp": "2026-02-15T02:58:41.178534"
+        "elapsed_seconds": 18.95
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -421,74 +460,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.25,
-        "timestamp": "2026-02-15T02:58:52.442209"
+        "elapsed_seconds": 11.25
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T02:59:01.300344"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.6,
-        "timestamp": "2026-02-15T02:59:09.899087"
+        "elapsed_seconds": 8.6
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.97,
-        "timestamp": "2026-02-15T02:59:18.868210"
+        "elapsed_seconds": 8.97
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.28,
-        "timestamp": "2026-02-15T02:59:28.144983"
+        "elapsed_seconds": 9.28
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.84,
-        "timestamp": "2026-02-15T02:59:36.985336"
+        "elapsed_seconds": 8.84
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T02:59:45.642290"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T02:59:54.444018"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.92,
-        "timestamp": "2026-02-15T03:00:03.366267"
+        "elapsed_seconds": 8.92
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.98,
-        "timestamp": "2026-02-15T03:00:13.347427"
+        "elapsed_seconds": 9.98
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -501,74 +553,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.58,
-        "timestamp": "2026-02-15T03:00:21.943001"
+        "elapsed_seconds": 8.58
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T03:00:30.699408"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.0,
-        "timestamp": "2026-02-15T03:00:40.702756"
+        "elapsed_seconds": 10.0
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 15.52,
-        "timestamp": "2026-02-15T03:00:56.226404"
+        "elapsed_seconds": 15.52
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.39,
-        "timestamp": "2026-02-15T03:01:08.620436"
+        "elapsed_seconds": 12.39
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T03:01:17.485269"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 26.55,
-        "timestamp": "2026-02-15T03:01:44.033311"
+        "elapsed_seconds": 26.55
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.11,
-        "timestamp": "2026-02-15T03:01:57.147656"
+        "elapsed_seconds": 13.11
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.4,
-        "timestamp": "2026-02-15T03:02:07.550743"
+        "elapsed_seconds": 10.4
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 106.88,
-        "timestamp": "2026-02-15T03:03:54.432014"
+        "elapsed_seconds": 106.88
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -581,74 +646,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 200.21,
-        "timestamp": "2026-02-15T03:07:14.658439"
+        "elapsed_seconds": 200.21
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 279.54,
-        "timestamp": "2026-02-15T03:11:54.196342"
+        "elapsed_seconds": 279.54
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 118.77,
-        "timestamp": "2026-02-15T03:13:52.970975"
+        "elapsed_seconds": 118.77
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 123.58,
-        "timestamp": "2026-02-15T03:15:56.549786"
+        "elapsed_seconds": 123.58
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 145.55,
-        "timestamp": "2026-02-15T03:18:22.096281"
+        "elapsed_seconds": 145.55
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 44.02,
-        "timestamp": "2026-02-15T03:19:06.115938"
+        "elapsed_seconds": 44.02
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.95,
-        "timestamp": "2026-02-15T03:19:15.064362"
+        "elapsed_seconds": 8.95
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T03:19:23.930216"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T03:19:32.863963"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T03:19:41.714663"
+        "elapsed_seconds": 8.85
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -661,74 +739,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.89,
-        "timestamp": "2026-02-15T03:19:50.619471"
+        "elapsed_seconds": 8.89
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T03:19:59.427214"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T03:20:08.165948"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.79,
-        "timestamp": "2026-02-15T03:20:16.960233"
+        "elapsed_seconds": 8.79
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.09,
-        "timestamp": "2026-02-15T03:20:26.051659"
+        "elapsed_seconds": 9.09
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.84,
-        "timestamp": "2026-02-15T03:20:34.895307"
+        "elapsed_seconds": 8.84
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T03:20:43.824550"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.67,
-        "timestamp": "2026-02-15T03:20:54.493539"
+        "elapsed_seconds": 10.67
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.78,
-        "timestamp": "2026-02-15T03:21:09.274295"
+        "elapsed_seconds": 14.78
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 19.65,
-        "timestamp": "2026-02-15T03:21:28.922507"
+        "elapsed_seconds": 19.65
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -741,74 +832,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 23.09,
-        "timestamp": "2026-02-15T03:21:52.027007"
+        "elapsed_seconds": 23.09
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.13,
-        "timestamp": "2026-02-15T03:22:04.154365"
+        "elapsed_seconds": 12.13
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 32.07,
-        "timestamp": "2026-02-15T03:22:36.225662"
+        "elapsed_seconds": 32.07
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 169.48,
-        "timestamp": "2026-02-15T03:25:25.700992"
+        "elapsed_seconds": 169.48
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 216.77,
-        "timestamp": "2026-02-15T03:29:02.470116"
+        "elapsed_seconds": 216.77
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 147.98,
-        "timestamp": "2026-02-15T03:31:30.452525"
+        "elapsed_seconds": 147.98
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 116.85,
-        "timestamp": "2026-02-15T03:33:27.302261"
+        "elapsed_seconds": 116.85
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 26.91,
-        "timestamp": "2026-02-15T03:33:54.215340"
+        "elapsed_seconds": 26.91
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.13,
-        "timestamp": "2026-02-15T03:34:04.344623"
+        "elapsed_seconds": 10.13
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T03:34:13.085523"
+        "elapsed_seconds": 8.74
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -821,74 +925,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T03:34:21.964977"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.1,
-        "timestamp": "2026-02-15T03:34:31.069521"
+        "elapsed_seconds": 9.1
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T03:34:39.882267"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.69,
-        "timestamp": "2026-02-15T03:34:48.576564"
+        "elapsed_seconds": 8.69
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.47,
-        "timestamp": "2026-02-15T03:34:58.049770"
+        "elapsed_seconds": 9.47
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T03:35:06.809746"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.96,
-        "timestamp": "2026-02-15T03:35:15.774676"
+        "elapsed_seconds": 8.96
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T03:35:24.623576"
+        "elapsed_seconds": 8.85
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T03:35:33.432680"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 18.53,
-        "timestamp": "2026-02-15T03:35:51.960403"
+        "elapsed_seconds": 18.53
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -901,74 +1018,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.59,
-        "timestamp": "2026-02-15T03:36:04.569330"
+        "elapsed_seconds": 12.59
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.64,
-        "timestamp": "2026-02-15T03:36:15.212725"
+        "elapsed_seconds": 10.64
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T03:36:23.961985"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T03:36:32.626319"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 22.67,
-        "timestamp": "2026-02-15T03:36:55.298264"
+        "elapsed_seconds": 22.67
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 17.95,
-        "timestamp": "2026-02-15T03:37:13.249720"
+        "elapsed_seconds": 17.95
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.26,
-        "timestamp": "2026-02-15T03:37:23.514709"
+        "elapsed_seconds": 10.26
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 45.61,
-        "timestamp": "2026-02-15T03:38:09.126707"
+        "elapsed_seconds": 45.61
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 184.81,
-        "timestamp": "2026-02-15T03:41:13.933392"
+        "elapsed_seconds": 184.81
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 332.67,
-        "timestamp": "2026-02-15T03:46:46.599232"
+        "elapsed_seconds": 332.67
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -981,74 +1111,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 226.63,
-        "timestamp": "2026-02-15T03:50:33.248598"
+        "elapsed_seconds": 226.63
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 71.4,
-        "timestamp": "2026-02-15T03:51:44.644915"
+        "elapsed_seconds": 71.4
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.09,
-        "timestamp": "2026-02-15T03:51:53.730835"
+        "elapsed_seconds": 9.09
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.9,
-        "timestamp": "2026-02-15T03:52:02.633400"
+        "elapsed_seconds": 8.9
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T03:52:11.333926"
+        "elapsed_seconds": 8.7
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 18.1,
-        "timestamp": "2026-02-15T03:52:29.430889"
+        "elapsed_seconds": 18.1
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.76,
-        "timestamp": "2026-02-15T03:52:41.192201"
+        "elapsed_seconds": 11.76
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T03:52:49.945905"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.43,
-        "timestamp": "2026-02-15T03:52:59.371699"
+        "elapsed_seconds": 9.43
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T03:53:08.201627"
+        "elapsed_seconds": 8.83
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1061,74 +1204,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.97,
-        "timestamp": "2026-02-15T03:53:17.186774"
+        "elapsed_seconds": 8.97
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.71,
-        "timestamp": "2026-02-15T03:53:25.897704"
+        "elapsed_seconds": 8.71
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T03:53:34.721867"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.56,
-        "timestamp": "2026-02-15T03:53:43.285745"
+        "elapsed_seconds": 8.56
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T03:53:52.110902"
+        "elapsed_seconds": 8.83
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.78,
-        "timestamp": "2026-02-15T03:54:00.893437"
+        "elapsed_seconds": 8.78
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T03:54:09.553858"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T03:54:18.424893"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 22.44,
-        "timestamp": "2026-02-15T03:54:40.867237"
+        "elapsed_seconds": 22.44
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.36,
-        "timestamp": "2026-02-15T03:54:52.226263"
+        "elapsed_seconds": 11.36
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1141,74 +1297,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.8,
-        "timestamp": "2026-02-15T03:55:02.042957"
+        "elapsed_seconds": 9.8
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T03:55:10.801946"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 21.93,
-        "timestamp": "2026-02-15T03:55:32.728051"
+        "elapsed_seconds": 21.93
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 19.72,
-        "timestamp": "2026-02-15T03:55:52.449503"
+        "elapsed_seconds": 19.72
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.42,
-        "timestamp": "2026-02-15T03:56:03.866288"
+        "elapsed_seconds": 11.42
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 104.69,
-        "timestamp": "2026-02-15T03:57:48.553594"
+        "elapsed_seconds": 104.69
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 153.77,
-        "timestamp": "2026-02-15T04:00:22.322045"
+        "elapsed_seconds": 153.77
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 246.72,
-        "timestamp": "2026-02-15T04:04:29.043569"
+        "elapsed_seconds": 246.72
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 237.94,
-        "timestamp": "2026-02-15T04:08:26.981664"
+        "elapsed_seconds": 237.94
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 178.53,
-        "timestamp": "2026-02-15T04:11:25.508710"
+        "elapsed_seconds": 178.53
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1221,74 +1390,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 55.79,
-        "timestamp": "2026-02-15T04:12:21.322470"
+        "elapsed_seconds": 55.79
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.99,
-        "timestamp": "2026-02-15T04:12:30.311893"
+        "elapsed_seconds": 8.99
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T04:12:39.143073"
+        "elapsed_seconds": 8.83
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.84,
-        "timestamp": "2026-02-15T04:12:53.986284"
+        "elapsed_seconds": 14.84
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.24,
-        "timestamp": "2026-02-15T04:13:08.228281"
+        "elapsed_seconds": 14.24
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.82,
-        "timestamp": "2026-02-15T04:13:20.051827"
+        "elapsed_seconds": 11.82
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T04:13:28.872234"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T04:13:37.643466"
+        "elapsed_seconds": 8.77
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.78,
-        "timestamp": "2026-02-15T04:13:46.421330"
+        "elapsed_seconds": 8.78
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T04:13:55.187989"
+        "elapsed_seconds": 8.77
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1301,74 +1483,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 17.8,
-        "timestamp": "2026-02-15T04:14:13.009071"
+        "elapsed_seconds": 17.8
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.81,
-        "timestamp": "2026-02-15T04:14:24.817002"
+        "elapsed_seconds": 11.81
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.99,
-        "timestamp": "2026-02-15T04:14:33.809457"
+        "elapsed_seconds": 8.99
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.73,
-        "timestamp": "2026-02-15T04:14:42.535045"
+        "elapsed_seconds": 8.73
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T04:14:51.335218"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.84,
-        "timestamp": "2026-02-15T04:15:00.177641"
+        "elapsed_seconds": 8.84
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T04:15:08.840999"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T04:15:17.662708"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T04:15:26.462266"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T04:15:35.288126"
+        "elapsed_seconds": 8.83
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1381,74 +1576,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.88,
-        "timestamp": "2026-02-15T04:15:44.203356"
+        "elapsed_seconds": 8.88
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.49,
-        "timestamp": "2026-02-15T04:15:57.694925"
+        "elapsed_seconds": 13.49
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 26.12,
-        "timestamp": "2026-02-15T04:16:23.815873"
+        "elapsed_seconds": 26.12
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.13,
-        "timestamp": "2026-02-15T04:16:37.948432"
+        "elapsed_seconds": 14.13
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 154.01,
-        "timestamp": "2026-02-15T04:19:11.958352"
+        "elapsed_seconds": 154.01
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 264.53,
-        "timestamp": "2026-02-15T04:23:36.484887"
+        "elapsed_seconds": 264.53
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 276.84,
-        "timestamp": "2026-02-15T04:28:13.327750"
+        "elapsed_seconds": 276.84
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 182.91,
-        "timestamp": "2026-02-15T04:31:16.238642"
+        "elapsed_seconds": 182.91
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 33.29,
-        "timestamp": "2026-02-15T04:31:49.524488"
+        "elapsed_seconds": 33.29
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.62,
-        "timestamp": "2026-02-15T04:31:59.144402"
+        "elapsed_seconds": 9.62
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1461,74 +1669,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T04:32:07.839901"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T04:32:16.772329"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.56,
-        "timestamp": "2026-02-15T04:32:27.328735"
+        "elapsed_seconds": 10.56
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 21.74,
-        "timestamp": "2026-02-15T04:32:49.069268"
+        "elapsed_seconds": 21.74
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 15.11,
-        "timestamp": "2026-02-15T04:33:04.175161"
+        "elapsed_seconds": 15.11
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T04:33:12.950012"
+        "elapsed_seconds": 8.77
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.96,
-        "timestamp": "2026-02-15T04:33:21.906056"
+        "elapsed_seconds": 8.96
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.04,
-        "timestamp": "2026-02-15T04:33:30.947135"
+        "elapsed_seconds": 9.04
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.07,
-        "timestamp": "2026-02-15T04:33:40.016619"
+        "elapsed_seconds": 9.07
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T04:33:48.847008"
+        "elapsed_seconds": 8.83
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1541,74 +1762,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.99,
-        "timestamp": "2026-02-15T04:33:58.868314"
+        "elapsed_seconds": 9.99
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.02,
-        "timestamp": "2026-02-15T04:34:10.888580"
+        "elapsed_seconds": 12.02
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.42,
-        "timestamp": "2026-02-15T04:34:20.306144"
+        "elapsed_seconds": 9.42
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T04:34:29.176572"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T04:34:38.032174"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.95,
-        "timestamp": "2026-02-15T04:34:46.984559"
+        "elapsed_seconds": 8.95
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.91,
-        "timestamp": "2026-02-15T04:34:55.889983"
+        "elapsed_seconds": 8.91
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T04:35:04.720453"
+        "elapsed_seconds": 8.83
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.94,
-        "timestamp": "2026-02-15T04:35:13.657356"
+        "elapsed_seconds": 8.94
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.07,
-        "timestamp": "2026-02-15T04:35:22.722487"
+        "elapsed_seconds": 9.07
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1621,74 +1855,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T04:35:31.459608"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 28.69,
-        "timestamp": "2026-02-15T04:36:00.145480"
+        "elapsed_seconds": 28.69
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.35,
-        "timestamp": "2026-02-15T04:36:14.493970"
+        "elapsed_seconds": 14.35
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.96,
-        "timestamp": "2026-02-15T04:36:23.451495"
+        "elapsed_seconds": 8.96
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 156.42,
-        "timestamp": "2026-02-15T04:38:59.876005"
+        "elapsed_seconds": 156.42
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 297.05,
-        "timestamp": "2026-02-15T04:43:56.930134"
+        "elapsed_seconds": 297.05
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 253.79,
-        "timestamp": "2026-02-15T04:48:10.718004"
+        "elapsed_seconds": 253.79
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 197.84,
-        "timestamp": "2026-02-15T04:51:28.562999"
+        "elapsed_seconds": 197.84
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 18.03,
-        "timestamp": "2026-02-15T04:51:46.597856"
+        "elapsed_seconds": 18.03
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.53,
-        "timestamp": "2026-02-15T04:51:56.125798"
+        "elapsed_seconds": 9.53
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1701,74 +1948,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.21,
-        "timestamp": "2026-02-15T04:52:05.368258"
+        "elapsed_seconds": 9.21
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T04:52:14.042512"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T04:52:22.767328"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T04:52:31.621188"
+        "elapsed_seconds": 8.85
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.95,
-        "timestamp": "2026-02-15T04:52:40.568395"
+        "elapsed_seconds": 8.95
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.91,
-        "timestamp": "2026-02-15T04:52:49.476222"
+        "elapsed_seconds": 8.91
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.61,
-        "timestamp": "2026-02-15T04:52:58.085512"
+        "elapsed_seconds": 8.61
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.9,
-        "timestamp": "2026-02-15T04:53:06.986291"
+        "elapsed_seconds": 8.9
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.9,
-        "timestamp": "2026-02-15T04:53:15.888332"
+        "elapsed_seconds": 8.9
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.6,
-        "timestamp": "2026-02-15T04:53:24.493031"
+        "elapsed_seconds": 8.6
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1781,74 +2041,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.3,
-        "timestamp": "2026-02-15T04:53:37.817673"
+        "elapsed_seconds": 13.3
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 20.19,
-        "timestamp": "2026-02-15T04:53:58.005302"
+        "elapsed_seconds": 20.19
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.38,
-        "timestamp": "2026-02-15T04:54:11.384817"
+        "elapsed_seconds": 13.38
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T04:54:20.127553"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T04:54:28.989503"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.99,
-        "timestamp": "2026-02-15T04:54:37.984036"
+        "elapsed_seconds": 8.99
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.95,
-        "timestamp": "2026-02-15T04:54:46.934126"
+        "elapsed_seconds": 8.95
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T04:54:55.737895"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T04:55:04.540897"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T04:55:13.352302"
+        "elapsed_seconds": 8.81
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1861,74 +2134,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.96,
-        "timestamp": "2026-02-15T04:55:22.348817"
+        "elapsed_seconds": 8.96
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.07,
-        "timestamp": "2026-02-15T04:55:36.417871"
+        "elapsed_seconds": 14.07
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 17.12,
-        "timestamp": "2026-02-15T04:55:53.537035"
+        "elapsed_seconds": 17.12
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.61,
-        "timestamp": "2026-02-15T04:56:04.150409"
+        "elapsed_seconds": 10.61
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.69,
-        "timestamp": "2026-02-15T04:56:15.840710"
+        "elapsed_seconds": 11.69
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 149.55,
-        "timestamp": "2026-02-15T04:58:45.390141"
+        "elapsed_seconds": 149.55
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 65.16,
-        "timestamp": "2026-02-15T04:59:50.546363"
+        "elapsed_seconds": 65.16
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 130.79,
-        "timestamp": "2026-02-15T05:02:01.333573"
+        "elapsed_seconds": 130.79
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 125.18,
-        "timestamp": "2026-02-15T05:04:06.514886"
+        "elapsed_seconds": 125.18
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 86.4,
-        "timestamp": "2026-02-15T05:05:32.910917"
+        "elapsed_seconds": 86.4
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -1941,74 +2227,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.58,
-        "timestamp": "2026-02-15T05:05:43.524535"
+        "elapsed_seconds": 10.58
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T05:05:52.381656"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.69,
-        "timestamp": "2026-02-15T05:06:01.071063"
+        "elapsed_seconds": 8.69
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T05:06:10.005289"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.54,
-        "timestamp": "2026-02-15T05:06:18.544692"
+        "elapsed_seconds": 8.54
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.6,
-        "timestamp": "2026-02-15T05:06:27.146768"
+        "elapsed_seconds": 8.6
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.0,
-        "timestamp": "2026-02-15T05:06:36.148797"
+        "elapsed_seconds": 9.0
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T05:06:44.906294"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T05:06:53.778114"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T05:07:02.537992"
+        "elapsed_seconds": 8.76
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2021,74 +2320,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T05:07:11.320625"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.88,
-        "timestamp": "2026-02-15T05:07:20.195960"
+        "elapsed_seconds": 8.88
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.63,
-        "timestamp": "2026-02-15T05:07:28.824118"
+        "elapsed_seconds": 8.63
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.92,
-        "timestamp": "2026-02-15T05:07:37.747820"
+        "elapsed_seconds": 8.92
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.04,
-        "timestamp": "2026-02-15T05:07:51.785132"
+        "elapsed_seconds": 14.04
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 38.48,
-        "timestamp": "2026-02-15T05:08:30.261076"
+        "elapsed_seconds": 38.48
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.86,
-        "timestamp": "2026-02-15T05:08:42.116927"
+        "elapsed_seconds": 11.86
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.78,
-        "timestamp": "2026-02-15T05:08:52.892575"
+        "elapsed_seconds": 10.78
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 141.21,
-        "timestamp": "2026-02-15T05:11:14.105014"
+        "elapsed_seconds": 141.21
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 188.87,
-        "timestamp": "2026-02-15T05:14:22.971600"
+        "elapsed_seconds": 188.87
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2101,74 +2413,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 124.59,
-        "timestamp": "2026-02-15T05:16:27.589938"
+        "elapsed_seconds": 124.59
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 142.22,
-        "timestamp": "2026-02-15T05:18:49.809130"
+        "elapsed_seconds": 142.22
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 137.03,
-        "timestamp": "2026-02-15T05:21:06.840425"
+        "elapsed_seconds": 137.03
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 45.01,
-        "timestamp": "2026-02-15T05:21:51.850168"
+        "elapsed_seconds": 45.01
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.83,
-        "timestamp": "2026-02-15T05:22:03.679854"
+        "elapsed_seconds": 11.83
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.7,
-        "timestamp": "2026-02-15T05:22:14.375098"
+        "elapsed_seconds": 10.7
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 61.2,
-        "timestamp": "2026-02-15T05:23:15.570216"
+        "elapsed_seconds": 61.2
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 129.45,
-        "timestamp": "2026-02-15T05:25:25.023716"
+        "elapsed_seconds": 129.45
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 182.4,
-        "timestamp": "2026-02-15T05:28:27.422548"
+        "elapsed_seconds": 182.4
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 60.63,
-        "timestamp": "2026-02-15T05:29:28.054922"
+        "elapsed_seconds": 60.63
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2181,74 +2506,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.27,
-        "timestamp": "2026-02-15T05:29:38.376308"
+        "elapsed_seconds": 10.27
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.99,
-        "timestamp": "2026-02-15T05:29:47.363882"
+        "elapsed_seconds": 8.99
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.94,
-        "timestamp": "2026-02-15T05:29:56.307678"
+        "elapsed_seconds": 8.94
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T05:30:05.123234"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T05:30:13.982520"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T05:30:22.726946"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.65,
-        "timestamp": "2026-02-15T05:30:31.376256"
+        "elapsed_seconds": 8.65
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T05:30:40.126450"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.91,
-        "timestamp": "2026-02-15T05:30:49.031689"
+        "elapsed_seconds": 8.91
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T05:30:57.843043"
+        "elapsed_seconds": 8.81
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2261,74 +2599,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.78,
-        "timestamp": "2026-02-15T05:31:06.658087"
+        "elapsed_seconds": 8.78
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.48,
-        "timestamp": "2026-02-15T05:31:17.142613"
+        "elapsed_seconds": 10.48
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 16.01,
-        "timestamp": "2026-02-15T05:31:33.153466"
+        "elapsed_seconds": 16.01
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.52,
-        "timestamp": "2026-02-15T05:31:43.678095"
+        "elapsed_seconds": 10.52
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 31.79,
-        "timestamp": "2026-02-15T05:32:15.466973"
+        "elapsed_seconds": 31.79
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.61,
-        "timestamp": "2026-02-15T05:32:28.078354"
+        "elapsed_seconds": 12.61
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 30.51,
-        "timestamp": "2026-02-15T05:32:58.584083"
+        "elapsed_seconds": 30.51
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 150.9,
-        "timestamp": "2026-02-15T05:35:29.483567"
+        "elapsed_seconds": 150.9
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 231.87,
-        "timestamp": "2026-02-15T05:39:21.354843"
+        "elapsed_seconds": 231.87
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 199.8,
-        "timestamp": "2026-02-15T05:42:41.157298"
+        "elapsed_seconds": 199.8
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2341,74 +2692,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 119.24,
-        "timestamp": "2026-02-15T05:44:40.432903"
+        "elapsed_seconds": 119.24
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 20.0,
-        "timestamp": "2026-02-15T05:45:00.429327"
+        "elapsed_seconds": 20.0
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.66,
-        "timestamp": "2026-02-15T05:45:10.085702"
+        "elapsed_seconds": 9.66
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T05:45:18.950919"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.21,
-        "timestamp": "2026-02-15T05:45:28.165502"
+        "elapsed_seconds": 9.21
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T05:45:36.969941"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.01,
-        "timestamp": "2026-02-15T05:45:45.979054"
+        "elapsed_seconds": 9.01
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T05:45:54.811375"
+        "elapsed_seconds": 8.83
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.42,
-        "timestamp": "2026-02-15T05:46:08.232139"
+        "elapsed_seconds": 13.42
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.11,
-        "timestamp": "2026-02-15T05:46:22.346532"
+        "elapsed_seconds": 14.11
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2421,74 +2785,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.06,
-        "timestamp": "2026-02-15T05:46:33.445445"
+        "elapsed_seconds": 11.06
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T05:46:42.262322"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.88,
-        "timestamp": "2026-02-15T05:46:51.142907"
+        "elapsed_seconds": 8.88
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.1,
-        "timestamp": "2026-02-15T05:47:03.246452"
+        "elapsed_seconds": 12.1
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.39,
-        "timestamp": "2026-02-15T05:47:13.639137"
+        "elapsed_seconds": 10.39
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.93,
-        "timestamp": "2026-02-15T05:47:23.566088"
+        "elapsed_seconds": 9.93
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.89,
-        "timestamp": "2026-02-15T05:47:32.452917"
+        "elapsed_seconds": 8.89
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T05:47:41.384682"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.92,
-        "timestamp": "2026-02-15T05:47:50.308486"
+        "elapsed_seconds": 8.92
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T05:47:59.007646"
+        "elapsed_seconds": 8.7
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2501,74 +2878,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T05:48:07.889174"
+        "elapsed_seconds": 8.85
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T05:48:16.711673"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.69,
-        "timestamp": "2026-02-15T05:48:25.397501"
+        "elapsed_seconds": 8.69
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T05:48:34.328318"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.69,
-        "timestamp": "2026-02-15T05:48:43.014499"
+        "elapsed_seconds": 8.69
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T05:48:51.734824"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.65,
-        "timestamp": "2026-02-15T05:49:00.387784"
+        "elapsed_seconds": 8.65
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 18.85,
-        "timestamp": "2026-02-15T05:49:19.234764"
+        "elapsed_seconds": 18.85
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 40.73,
-        "timestamp": "2026-02-15T05:49:59.970003"
+        "elapsed_seconds": 40.73
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 227.88,
-        "timestamp": "2026-02-15T05:53:47.854777"
+        "elapsed_seconds": 227.88
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2581,74 +2971,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 300.88,
-        "timestamp": "2026-02-15T05:58:48.782208"
+        "elapsed_seconds": 300.88
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 47.78,
-        "timestamp": "2026-02-15T05:59:36.562338"
+        "elapsed_seconds": 47.78
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T05:59:45.315992"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.14,
-        "timestamp": "2026-02-15T05:59:54.455549"
+        "elapsed_seconds": 9.14
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.37,
-        "timestamp": "2026-02-15T06:00:03.822495"
+        "elapsed_seconds": 9.37
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.09,
-        "timestamp": "2026-02-15T06:00:12.915183"
+        "elapsed_seconds": 9.09
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T06:00:21.679217"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.16,
-        "timestamp": "2026-02-15T06:00:30.834516"
+        "elapsed_seconds": 9.16
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T06:00:39.631483"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T06:00:48.383588"
+        "elapsed_seconds": 8.75
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2661,74 +3064,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.93,
-        "timestamp": "2026-02-15T06:00:57.362361"
+        "elapsed_seconds": 8.93
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.21,
-        "timestamp": "2026-02-15T06:01:06.568353"
+        "elapsed_seconds": 9.21
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 16.6,
-        "timestamp": "2026-02-15T06:01:23.170623"
+        "elapsed_seconds": 16.6
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.64,
-        "timestamp": "2026-02-15T06:01:32.810972"
+        "elapsed_seconds": 9.64
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.62,
-        "timestamp": "2026-02-15T06:01:43.435160"
+        "elapsed_seconds": 10.62
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T06:01:52.173742"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T06:02:00.830474"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T06:02:09.553826"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 17.06,
-        "timestamp": "2026-02-15T06:02:26.612698"
+        "elapsed_seconds": 17.06
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T06:02:35.479532"
+        "elapsed_seconds": 8.87
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2741,74 +3157,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T06:02:44.266745"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T06:02:52.931673"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T06:03:01.793268"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.68,
-        "timestamp": "2026-02-15T06:03:10.475305"
+        "elapsed_seconds": 8.68
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T06:03:19.322951"
+        "elapsed_seconds": 8.85
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T06:03:28.093854"
+        "elapsed_seconds": 8.77
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T06:03:36.899353"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.04,
-        "timestamp": "2026-02-15T06:03:46.937059"
+        "elapsed_seconds": 10.04
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 19.01,
-        "timestamp": "2026-02-15T06:04:05.949166"
+        "elapsed_seconds": 19.01
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.79,
-        "timestamp": "2026-02-15T06:04:14.734601"
+        "elapsed_seconds": 8.79
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2821,74 +3250,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T06:04:23.596913"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 117.54,
-        "timestamp": "2026-02-15T06:06:21.133437"
+        "elapsed_seconds": 117.54
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 211.4,
-        "timestamp": "2026-02-15T06:09:52.530091"
+        "elapsed_seconds": 211.4
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 183.08,
-        "timestamp": "2026-02-15T06:12:55.615368"
+        "elapsed_seconds": 183.08
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 32.93,
-        "timestamp": "2026-02-15T06:13:28.547876"
+        "elapsed_seconds": 32.93
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.83,
-        "timestamp": "2026-02-15T06:13:37.377903"
+        "elapsed_seconds": 8.83
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.99,
-        "timestamp": "2026-02-15T06:13:46.367885"
+        "elapsed_seconds": 8.99
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.91,
-        "timestamp": "2026-02-15T06:13:55.278563"
+        "elapsed_seconds": 8.91
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.04,
-        "timestamp": "2026-02-15T06:14:04.319414"
+        "elapsed_seconds": 9.04
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T06:14:13.017387"
+        "elapsed_seconds": 8.7
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2901,74 +3343,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T06:14:21.733221"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T06:14:30.532155"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.9,
-        "timestamp": "2026-02-15T06:14:39.436667"
+        "elapsed_seconds": 8.9
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.86,
-        "timestamp": "2026-02-15T06:14:48.297639"
+        "elapsed_seconds": 8.86
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T06:14:57.053540"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.85,
-        "timestamp": "2026-02-15T06:15:05.900969"
+        "elapsed_seconds": 8.85
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.18,
-        "timestamp": "2026-02-15T06:15:15.079813"
+        "elapsed_seconds": 9.18
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T06:15:23.779338"
+        "elapsed_seconds": 8.7
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T06:15:32.542191"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T06:15:41.241803"
+        "elapsed_seconds": 8.7
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -2981,74 +3436,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 19.87,
-        "timestamp": "2026-02-15T06:16:01.157051"
+        "elapsed_seconds": 19.87
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.21,
-        "timestamp": "2026-02-15T06:16:11.362792"
+        "elapsed_seconds": 10.21
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.22,
-        "timestamp": "2026-02-15T06:16:20.581725"
+        "elapsed_seconds": 9.22
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.96,
-        "timestamp": "2026-02-15T06:16:29.538477"
+        "elapsed_seconds": 8.96
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.1,
-        "timestamp": "2026-02-15T06:16:38.638069"
+        "elapsed_seconds": 9.1
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.43,
-        "timestamp": "2026-02-15T06:16:51.069317"
+        "elapsed_seconds": 12.43
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 13.68,
-        "timestamp": "2026-02-15T06:17:04.750983"
+        "elapsed_seconds": 13.68
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.18,
-        "timestamp": "2026-02-15T06:17:16.931553"
+        "elapsed_seconds": 12.18
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.59,
-        "timestamp": "2026-02-15T06:17:28.526164"
+        "elapsed_seconds": 11.59
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 132.8,
-        "timestamp": "2026-02-15T06:19:41.324761"
+        "elapsed_seconds": 132.8
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3061,74 +3529,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 82.29,
-        "timestamp": "2026-02-15T06:21:03.653680"
+        "elapsed_seconds": 82.29
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.14,
-        "timestamp": "2026-02-15T06:21:12.797551"
+        "elapsed_seconds": 9.14
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 22.33,
-        "timestamp": "2026-02-15T06:21:35.127296"
+        "elapsed_seconds": 22.33
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 163.03,
-        "timestamp": "2026-02-15T06:24:18.162320"
+        "elapsed_seconds": 163.03
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 130.97,
-        "timestamp": "2026-02-15T06:26:29.136770"
+        "elapsed_seconds": 130.97
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 114.09,
-        "timestamp": "2026-02-15T06:28:23.222073"
+        "elapsed_seconds": 114.09
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 15.47,
-        "timestamp": "2026-02-15T06:28:38.694074"
+        "elapsed_seconds": 15.47
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.17,
-        "timestamp": "2026-02-15T06:28:48.868135"
+        "elapsed_seconds": 10.17
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.32,
-        "timestamp": "2026-02-15T06:29:01.187415"
+        "elapsed_seconds": 12.32
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 138.77,
-        "timestamp": "2026-02-15T06:31:19.953380"
+        "elapsed_seconds": 138.77
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3141,74 +3622,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 137.16,
-        "timestamp": "2026-02-15T06:33:37.159500"
+        "elapsed_seconds": 137.16
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.5,
-        "timestamp": "2026-02-15T06:33:51.659941"
+        "elapsed_seconds": 14.5
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.17,
-        "timestamp": "2026-02-15T06:34:02.826885"
+        "elapsed_seconds": 11.17
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.61,
-        "timestamp": "2026-02-15T06:34:11.438948"
+        "elapsed_seconds": 8.61
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.71,
-        "timestamp": "2026-02-15T06:34:20.145243"
+        "elapsed_seconds": 8.71
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T06:34:28.809631"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.03,
-        "timestamp": "2026-02-15T06:34:37.842654"
+        "elapsed_seconds": 9.03
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T06:34:46.566995"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.62,
-        "timestamp": "2026-02-15T06:34:55.190795"
+        "elapsed_seconds": 8.62
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T06:35:03.962022"
+        "elapsed_seconds": 8.77
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3221,74 +3715,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.68,
-        "timestamp": "2026-02-15T06:35:12.682351"
+        "elapsed_seconds": 8.68
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.1,
-        "timestamp": "2026-02-15T06:35:21.780179"
+        "elapsed_seconds": 9.1
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.19,
-        "timestamp": "2026-02-15T06:35:30.966476"
+        "elapsed_seconds": 9.19
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T06:35:39.681793"
+        "elapsed_seconds": 8.72
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.73,
-        "timestamp": "2026-02-15T06:35:48.413338"
+        "elapsed_seconds": 8.73
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T06:35:57.169054"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 12.33,
-        "timestamp": "2026-02-15T06:36:09.496317"
+        "elapsed_seconds": 12.33
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.93,
-        "timestamp": "2026-02-15T06:36:19.428173"
+        "elapsed_seconds": 9.93
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T06:36:28.301211"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T06:36:36.999165"
+        "elapsed_seconds": 8.7
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3301,74 +3808,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 22.83,
-        "timestamp": "2026-02-15T06:36:59.880274"
+        "elapsed_seconds": 22.83
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.09,
-        "timestamp": "2026-02-15T06:37:09.969439"
+        "elapsed_seconds": 10.09
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.77,
-        "timestamp": "2026-02-15T06:37:19.740474"
+        "elapsed_seconds": 9.77
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 105.24,
-        "timestamp": "2026-02-15T06:39:04.984739"
+        "elapsed_seconds": 105.24
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 160.98,
-        "timestamp": "2026-02-15T06:41:45.968474"
+        "elapsed_seconds": 160.98
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 278.67,
-        "timestamp": "2026-02-15T06:46:24.634177"
+        "elapsed_seconds": 278.67
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 123.99,
-        "timestamp": "2026-02-15T06:48:28.621816"
+        "elapsed_seconds": 123.99
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T06:48:37.389388"
+        "elapsed_seconds": 8.77
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.78,
-        "timestamp": "2026-02-15T06:48:46.173374"
+        "elapsed_seconds": 8.78
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.69,
-        "timestamp": "2026-02-15T06:48:54.863447"
+        "elapsed_seconds": 8.69
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3381,74 +3901,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T06:49:03.653155"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.55,
-        "timestamp": "2026-02-15T06:49:13.205386"
+        "elapsed_seconds": 9.55
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.68,
-        "timestamp": "2026-02-15T06:49:21.884708"
+        "elapsed_seconds": 8.68
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T06:49:30.690813"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.62,
-        "timestamp": "2026-02-15T06:49:39.306828"
+        "elapsed_seconds": 8.62
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T06:49:48.052435"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.34,
-        "timestamp": "2026-02-15T06:49:57.390340"
+        "elapsed_seconds": 9.34
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.63,
-        "timestamp": "2026-02-15T06:50:06.023664"
+        "elapsed_seconds": 8.63
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.92,
-        "timestamp": "2026-02-15T06:50:15.945652"
+        "elapsed_seconds": 9.92
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 14.53,
-        "timestamp": "2026-02-15T06:50:30.476802"
+        "elapsed_seconds": 14.53
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3461,74 +3994,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 15.19,
-        "timestamp": "2026-02-15T06:50:45.705932"
+        "elapsed_seconds": 15.19
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.74,
-        "timestamp": "2026-02-15T06:50:55.441512"
+        "elapsed_seconds": 9.74
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.66,
-        "timestamp": "2026-02-15T06:51:04.103414"
+        "elapsed_seconds": 8.66
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.7,
-        "timestamp": "2026-02-15T06:51:12.805110"
+        "elapsed_seconds": 8.7
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T06:51:21.611796"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.76,
-        "timestamp": "2026-02-15T06:51:30.374279"
+        "elapsed_seconds": 8.76
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T06:51:39.127639"
+        "elapsed_seconds": 8.75
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.92,
-        "timestamp": "2026-02-15T06:51:48.044570"
+        "elapsed_seconds": 8.92
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.88,
-        "timestamp": "2026-02-15T06:51:56.929598"
+        "elapsed_seconds": 8.88
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.72,
-        "timestamp": "2026-02-15T06:52:05.654328"
+        "elapsed_seconds": 8.72
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3541,74 +4087,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.64,
-        "timestamp": "2026-02-15T06:52:14.326999"
+        "elapsed_seconds": 8.64
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T06:52:22.996746"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.74,
-        "timestamp": "2026-02-15T06:52:31.733293"
+        "elapsed_seconds": 8.74
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.9,
-        "timestamp": "2026-02-15T06:52:40.637988"
+        "elapsed_seconds": 8.9
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 20.09,
-        "timestamp": "2026-02-15T06:53:00.729580"
+        "elapsed_seconds": 20.09
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.59,
-        "timestamp": "2026-02-15T06:53:10.323965"
+        "elapsed_seconds": 9.59
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.72,
-        "timestamp": "2026-02-15T06:53:20.042140"
+        "elapsed_seconds": 9.72
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 36.42,
-        "timestamp": "2026-02-15T06:53:56.459642"
+        "elapsed_seconds": 36.42
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 172.25,
-        "timestamp": "2026-02-15T06:56:48.710345"
+        "elapsed_seconds": 172.25
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 246.23,
-        "timestamp": "2026-02-15T07:00:54.938162"
+        "elapsed_seconds": 246.23
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3621,74 +4180,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 121.41,
-        "timestamp": "2026-02-15T07:02:56.392411"
+        "elapsed_seconds": 121.41
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.8,
-        "timestamp": "2026-02-15T07:03:05.193450"
+        "elapsed_seconds": 8.8
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.77,
-        "timestamp": "2026-02-15T07:03:13.960398"
+        "elapsed_seconds": 8.77
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 9.09,
-        "timestamp": "2026-02-15T07:03:23.049421"
+        "elapsed_seconds": 9.09
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 11.85,
-        "timestamp": "2026-02-15T07:03:34.904043"
+        "elapsed_seconds": 11.85
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.87,
-        "timestamp": "2026-02-15T07:03:43.775392"
+        "elapsed_seconds": 8.87
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.81,
-        "timestamp": "2026-02-15T07:03:52.581956"
+        "elapsed_seconds": 8.81
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.63,
-        "timestamp": "2026-02-15T07:04:01.207776"
+        "elapsed_seconds": 8.63
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.73,
-        "timestamp": "2026-02-15T07:04:09.941607"
+        "elapsed_seconds": 8.73
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.75,
-        "timestamp": "2026-02-15T07:04:18.691567"
+        "elapsed_seconds": 8.75
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-26",
@@ -3701,74 +4273,87 @@
       {
         "run_id": 1,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.78,
-        "timestamp": "2026-02-15T07:04:27.520351"
+        "elapsed_seconds": 8.78
       },
       {
         "run_id": 2,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.88,
-        "timestamp": "2026-02-15T07:04:36.399819"
+        "elapsed_seconds": 8.88
       },
       {
         "run_id": 3,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.82,
-        "timestamp": "2026-02-15T07:04:45.214987"
+        "elapsed_seconds": 8.82
       },
       {
         "run_id": 4,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.67,
-        "timestamp": "2026-02-15T07:04:53.882732"
+        "elapsed_seconds": 8.67
       },
       {
         "run_id": 5,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.68,
-        "timestamp": "2026-02-15T07:05:02.563023"
+        "elapsed_seconds": 8.68
       },
       {
         "run_id": 6,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 16.48,
-        "timestamp": "2026-02-15T07:05:19.039324"
+        "elapsed_seconds": 16.48
       },
       {
         "run_id": 7,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.01,
-        "timestamp": "2026-02-15T07:05:29.048854"
+        "elapsed_seconds": 10.01
       },
       {
         "run_id": 8,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 8.63,
-        "timestamp": "2026-02-15T07:05:37.677941"
+        "elapsed_seconds": 8.63
       },
       {
         "run_id": 9,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 10.4,
-        "timestamp": "2026-02-15T07:05:48.082947"
+        "elapsed_seconds": 10.4
       },
       {
         "run_id": 10,
         "prediction": "",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [],
-        "elapsed_seconds": 24.9,
-        "timestamp": "2026-02-15T07:06:12.987632"
+        "elapsed_seconds": 24.9
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 10
   },
   {
     "sample_id": "conv-30",
@@ -3781,6 +4366,8 @@
       {
         "run_id": 1,
         "prediction": "决策解析失败，无法获取有效回答",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T14:52:04.551945",
@@ -3790,10 +4377,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 7.27,
-        "timestamp": "2026-02-15T14:52:04.555105"
+        "elapsed_seconds": 7.27
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 1
   },
   {
     "sample_id": "conv-41",
@@ -3806,6 +4395,8 @@
       {
         "run_id": 1,
         "prediction": "决策解析失败，无法获取有效回答",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T15:00:51.207857",
@@ -3815,10 +4406,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 8.56,
-        "timestamp": "2026-02-15T15:00:51.211633"
+        "elapsed_seconds": 8.56
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 1
   },
   {
     "sample_id": "conv-42",
@@ -3831,6 +4424,8 @@
       {
         "run_id": 1,
         "prediction": "{\"action\": \"finish\", \"reasoning\": \"The conversation history across 29 sessions provides multiple instances showing Nate's social interactions beyond Joanna, including friends from gaming tournaments, conventions, gaming parties, pet playdates, vegan diet groups, and international tournament assistance.\", \"params\": {}, \"instruction\": \"Based on the provided analysis, the answer to the question 'Is it likely that Nate has friends besides Joanna?' is yes.\", \"locale\": \"en-US\"}",
+        "f1_score": 0.0667,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:12:12.939864",
@@ -3840,10 +4435,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 12.68,
-        "timestamp": "2026-02-15T17:12:12.947401"
+        "elapsed_seconds": 12.68
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 1
   },
   {
     "sample_id": "conv-43",
@@ -3856,6 +4453,8 @@
       {
         "run_id": 1,
         "prediction": "{\n  \"action\": \"finish\",\n  \"reasoning\": \"The analysis provides a comprehensive breakdown of John's basketball career goals across multiple sessions, covering on-court performance, team leadership, endorsements, off-court impact, and long-term legacy. This fully addresses the user's question.\",\n  \"params\": {},\n  \"instruction\": \"Based on the analysis, John's goals include improving shooting and scoring, winning a championship, building team bonds, securing endorsements, starting a foundation, and creating a positive community legacy.\",\n  \"locale\": \"en-US\"\n}",
+        "f1_score": 0.7222,
+        "success": true,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:12:29.421738",
@@ -3872,10 +4471,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 29.56,
-        "timestamp": "2026-02-15T17:12:42.579994"
+        "elapsed_seconds": 29.56
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 1,
+    "failure_count": 0
   },
   {
     "sample_id": "conv-44",
@@ -3888,6 +4489,8 @@
       {
         "run_id": 1,
         "prediction": "2020",
+        "f1_score": 1.0,
+        "success": true,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:12:57.017598",
@@ -3904,10 +4507,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 22.25,
-        "timestamp": "2026-02-15T17:13:04.880099"
+        "elapsed_seconds": 22.25
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 1,
+    "failure_count": 0
   },
   {
     "sample_id": "conv-47",
@@ -3920,6 +4525,8 @@
       {
         "run_id": 1,
         "prediction": "Chronic stress, potential sedentary lifestyle, mental fatigue, work-life imbalance",
+        "f1_score": 0.0,
+        "success": false,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:13:22.881541",
@@ -3943,10 +4550,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 52.13,
-        "timestamp": "2026-02-15T17:13:57.065848"
+        "elapsed_seconds": 52.13
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 0,
+    "failure_count": 1
   },
   {
     "sample_id": "conv-48",
@@ -3959,6 +4568,8 @@
       {
         "run_id": 1,
         "prediction": "electrical engineering project",
+        "f1_score": 1.0,
+        "success": true,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:14:06.562787",
@@ -3968,10 +4579,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 9.42,
-        "timestamp": "2026-02-15T17:14:06.563804"
+        "elapsed_seconds": 9.42
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 1,
+    "failure_count": 0
   },
   {
     "sample_id": "conv-49",
@@ -3984,6 +4597,8 @@
       {
         "run_id": 1,
         "prediction": "Prius",
+        "f1_score": 1.0,
+        "success": true,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:14:15.791974",
@@ -3993,10 +4608,12 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 9.18,
-        "timestamp": "2026-02-15T17:14:15.793233"
+        "elapsed_seconds": 9.18
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 1,
+    "failure_count": 0
   },
   {
     "sample_id": "conv-50",
@@ -4009,6 +4626,8 @@
       {
         "run_id": 1,
         "prediction": "April 2023",
+        "f1_score": 0.5,
+        "success": true,
         "memory_stack_log": [
           {
             "timestamp": "2026-02-15T17:14:25.853726",
@@ -4018,9 +4637,11 @@
             "result": null
           }
         ],
-        "elapsed_seconds": 10.03,
-        "timestamp": "2026-02-15T17:14:25.864941"
+        "elapsed_seconds": 10.03
       }
-    ]
+    ],
+    "success_summary": "Summary generation failed: Error code: 403 - {'detail': 'Not authenticated'}",
+    "success_count": 1,
+    "failure_count": 0
   }
 ]
