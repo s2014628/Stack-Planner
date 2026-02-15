@@ -21,6 +21,9 @@ DEFAULT_LOCOMO_DATA = os.path.join(
     os.path.dirname(__file__), "..", "..", "..", "locomo", "data", "locomo10.json"
 )
 
+DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
+
 
 def build_experience_data(
     evaluated_results: list,
@@ -75,7 +78,8 @@ def main():
         default=DEFAULT_LOCOMO_DATA,
         help="Path to locomo10.json",
     )
-    parser.add_argument("--output-dir", type=str, default="./results/locomo")
+    parser.add_argument("--output-dir", type=str, default="./results/locomo",
+                        help="Base output directory. A timestamped subdirectory will be created for each run.")
     parser.add_argument("--num-runs", type=int, default=10)
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--categories", type=int, nargs="*", default=None)
@@ -84,29 +88,31 @@ def main():
     parser.add_argument("--skip-benchmark", action="store_true", help="Skip benchmark run, use existing results")
     parser.add_argument("--skip-summary", action="store_true", help="Skip summary generation")
     parser.add_argument(
-        "--deepseek-base-url",
+        "--summary-base-url",
         type=str,
-        default=os.getenv("DEEPSEEK_BASE_URL", "http://123.57.228.132:8285/api"),
+        default=os.getenv("SUMMARY_BASE_URL", DEFAULT_SUMMARY_BASE_URL),
     )
     parser.add_argument(
-        "--deepseek-api-key",
+        "--summary-api-key",
         type=str,
-        default=os.getenv("DEEPSEEK_API_KEY", ""),
+        default=os.getenv("SUMMARY_API_KEY", ""),
     )
     parser.add_argument(
-        "--deepseek-model",
+        "--summary-model",
         type=str,
-        default=os.getenv("DEEPSEEK_MODEL", "deepseek-v3.2-20251201-160k-local"),
+        default=os.getenv("SUMMARY_MODEL", DEFAULT_SUMMARY_MODEL),
     )
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = os.path.join(args.output_dir, f"run_{run_timestamp}")
+    os.makedirs(run_dir, exist_ok=True)
 
     print("=" * 60)
     print("LoCoMo Experience Data Pipeline")
     print("=" * 60)
     print(f"Data path: {args.data_path}")
-    print(f"Output dir: {args.output_dir}")
+    print(f"Output dir: {run_dir}")
     print(f"Runs per QA: {args.num_runs}")
     print(f"Temperature: {args.temperature}")
     print(f"Categories filter: {args.categories}")
@@ -121,10 +127,10 @@ def main():
     )
     print(f"Loaded {len(samples)} QA samples from {len(data)} conversations")
 
-    samples_file = os.path.join(args.output_dir, "prepared_samples.json")
+    samples_file = os.path.join(run_dir, "prepared_samples.json")
     save_samples(samples, samples_file)
 
-    benchmark_results_file = os.path.join(args.output_dir, "benchmark_results.json")
+    benchmark_results_file = os.path.join(run_dir, "benchmark_results.json")
 
     if args.skip_benchmark and os.path.exists(benchmark_results_file):
         print("\n[Step 2] Loading existing benchmark results (--skip-benchmark)...")
@@ -137,7 +143,7 @@ def main():
                 samples,
                 num_runs=args.num_runs,
                 temperature=args.temperature,
-                output_dir=args.output_dir,
+                output_dir=run_dir,
                 resume=not args.no_resume,
             )
         )
@@ -160,26 +166,26 @@ def main():
             f"{success_count}/{total} success, avg_f1={avg_f1:.4f}"
         )
 
-    evaluated_file = os.path.join(args.output_dir, "evaluated_results.json")
+    evaluated_file = os.path.join(run_dir, "evaluated_results.json")
     with open(evaluated_file, "w", encoding="utf-8") as f:
         json.dump(benchmark_results, f, ensure_ascii=False, indent=2)
 
     summaries = []
     if not args.skip_summary:
-        print("\n[Step 4] Generating experience summaries with DeepSeek...")
+        print("\n[Step 4] Generating experience summaries...")
         summary_agent = SummaryAgent(
-            base_url=args.deepseek_base_url,
-            api_key=args.deepseek_api_key,
-            model=args.deepseek_model,
+            base_url=args.summary_base_url,
+            api_key=args.summary_api_key,
+            model=args.summary_model,
         )
         summaries = summary_agent.summarize_batch(benchmark_results)
 
-        summaries_file = os.path.join(args.output_dir, "summaries.json")
+        summaries_file = os.path.join(run_dir, "summaries.json")
         with open(summaries_file, "w", encoding="utf-8") as f:
             json.dump(summaries, f, ensure_ascii=False, indent=2)
     else:
         print("\n[Step 4] Skipping summary generation (--skip-summary)")
-        summaries_file = os.path.join(args.output_dir, "summaries.json")
+        summaries_file = os.path.join(run_dir, "summaries.json")
         if os.path.exists(summaries_file):
             with open(summaries_file, "r", encoding="utf-8") as f:
                 summaries = json.load(f)
@@ -187,7 +193,7 @@ def main():
     print("\n[Step 5] Building final experience data...")
     experience_data = build_experience_data(benchmark_results, summaries)
 
-    output_file = os.path.join(args.output_dir, "experience_data.json")
+    output_file = os.path.join(run_dir, "experience_data.json")
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(experience_data, f, ensure_ascii=False, indent=2)
 
