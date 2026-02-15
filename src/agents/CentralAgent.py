@@ -613,7 +613,6 @@ class CentralAgent:
         if not reasoning:
             return ""
 
-        observations = state.get("observations", [])
         user_query = state.get("user_query", "")
 
         extraction_prompt = (
