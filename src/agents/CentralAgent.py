@@ -603,6 +603,21 @@ class CentralAgent:
             goto=agent_type,
         )
 
+    @staticmethod
+    def _strip_json_wrapper(text: str) -> str:
+        """If text looks like a Decision JSON, extract the reasoning field value."""
+        if not text:
+            return text
+        stripped = text.strip()
+        if stripped.startswith("{") and "reasoning" in stripped:
+            try:
+                parsed = json.loads(stripped)
+                if isinstance(parsed, dict) and "reasoning" in parsed:
+                    return parsed["reasoning"]
+            except (json.JSONDecodeError, ValueError):
+                pass
+        return text
+
     def _extract_concise_answer(
         self, reasoning: str, state: State
     ) -> str:
@@ -612,6 +627,8 @@ class CentralAgent:
         """
         if not reasoning:
             return ""
+
+        reasoning = self._strip_json_wrapper(reasoning)
 
         user_query = state.get("user_query", "")
 

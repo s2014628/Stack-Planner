@@ -1,12 +1,11 @@
-import json
 import os
 from typing import Any, Dict, List
 
 from openai import OpenAI
 
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "http://123.57.228.132:8285/api")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-v3.2-20251201-160k-local")
+SUMMARY_BASE_URL = os.getenv("SUMMARY_BASE_URL", "https://openrouter.ai/api/v1")
+SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "")
+SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", "deepseek/deepseek-v3.2")
 
 SUMMARY_SYSTEM_PROMPT = """You are an expert at analyzing multi-agent system execution traces.
 Your task is to compare successful and failed execution runs and identify patterns.
@@ -45,9 +44,9 @@ class SummaryAgent:
 
     def __init__(
         self,
-        base_url: str = DEEPSEEK_BASE_URL,
-        api_key: str = DEEPSEEK_API_KEY,
-        model: str = DEEPSEEK_MODEL,
+        base_url: str = SUMMARY_BASE_URL,
+        api_key: str = SUMMARY_API_KEY,
+        model: str = SUMMARY_MODEL,
     ):
         self.client = OpenAI(
             base_url=base_url,
