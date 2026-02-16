@@ -6,7 +6,6 @@ from .decorators import log_io
 from src.utils.logger import logger
 from src.utils.reference_utils import global_reference_map
 
-
 # 得到知识库，做筛选的
 # def get_kb_id_by_name(kb_name):
 #     url = "https://ragflow.pkubir.cn/v1/kb_api/list"

@@ -17,7 +17,6 @@ from typing import List, Optional
 
 from openai import OpenAI, AsyncOpenAI
 
-
 # ============ 配置 ============
 
 API_KEY = "sk-d47ad54165ee456093bc9ffd599e354e"

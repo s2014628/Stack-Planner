@@ -2,6 +2,7 @@
 """
 Direct OpenAI API test for the new endpoint
 """
+
 from openai import OpenAI
 import requests
 import json

@@ -17,7 +17,6 @@ from typing import List, Optional
 
 from openai import OpenAI, AsyncOpenAI
 
-
 # ============ 配置 ============
 
 API_KEY = "not-needed"

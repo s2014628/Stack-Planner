@@ -16,7 +16,6 @@ from src.tools.tavily_search.tavily_search_results_with_images import (
 
 from src.tools.decorators import create_logged_tool
 
-
 # Create logged versions of the search tools
 LoggedTavilySearch = create_logged_tool(TavilySearchResultsWithImages)
 LoggedDuckDuckGoSearch = create_logged_tool(DuckDuckGoSearchResults)
