@@ -4,12 +4,8 @@ from typing import Any, Dict, List
 from openai import OpenAI
 
 SUMMARY_BASE_URL = os.getenv("SUMMARY_BASE_URL", "http://123.57.228.132:8285/api")
-SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "sk-7374e2abda1141ffa4fe8eb01ae582f7")
+SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "")
 SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", "deepseek-v3.2-20251201-160k-local")
-# Old OpenRouter config:
-# SUMMARY_BASE_URL = os.getenv("SUMMARY_BASE_URL", "https://openrouter.ai/api/v1")
-# SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "")
-# SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", "deepseek/deepseek-v3.2")
 
 SUMMARY_SYSTEM_PROMPT = """You are an expert at analyzing multi-agent system execution traces.
 Your task is to compare successful and failed execution runs and identify patterns.
