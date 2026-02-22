@@ -63,6 +63,7 @@ async def _run_graph(
     config = {
         "configurable": {
             "thread_id": f"locomo_{datetime.now().timestamp()}",
+            "graph_format": "locomo",
             "max_plan_iterations": 1,
             "max_step_num": 3,
             "mcp_settings": {},
