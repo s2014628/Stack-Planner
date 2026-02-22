@@ -49,7 +49,8 @@ async def _run_graph(
         f"Analyze the conversation context in the system information and determine your action. "
         f"The question to answer is: {question}\n\n"
         f"IMPORTANT: Your response MUST be a JSON object with fields: action, reasoning, params, instruction, locale. "
-        f"Do NOT answer the question directly. Choose an action (think/finish) and put your analysis in the reasoning field."
+        f"Do NOT answer the question directly. Choose an action (think/finish) and put your analysis in the reasoning field. "
+        f"You MUST respond in English. Set locale to 'en' in your JSON response."
     )
 
     initial_state = {
@@ -58,6 +59,7 @@ async def _run_graph(
         "auto_accepted_plan": True,
         "enable_background_investigation": False,
         "user_query": task_message,
+        "locale": "en",
     }
 
     config = {
