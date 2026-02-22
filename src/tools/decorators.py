@@ -5,7 +5,6 @@ from src.utils.logger import logger
 import functools
 from typing import Any, Callable, Type, TypeVar
 
-
 T = TypeVar("T")
 
 
