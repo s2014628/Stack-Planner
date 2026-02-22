@@ -7,6 +7,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional, Type, Union, c
 
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
+from langgraph.graph import END
 from langgraph.types import Command
 
 from src.agents.sub_agent_registry import get_sub_agents_by_global_type
@@ -66,6 +67,7 @@ class CentralAgent:
     def __init__(self, graph_format: str = "sp"):
         self.memory_stack = MemoryStack()
         self._decision_count = 0
+        self._graph_format = graph_format
         from src.agents.SubAgentManager import SubAgentManager
 
         self.sub_agent_manager = SubAgentManager(self)
@@ -116,6 +118,20 @@ class CentralAgent:
         self._decision_count += 1
         logger.info(f"中枢Agent正在进行决策... (第{self._decision_count}次)")
         start_time = datetime.now()
+
+        if self._decision_count > self.MAX_DECISION_ITERATIONS:
+            logger.warning(f"决策次数超过上限({self.MAX_DECISION_ITERATIONS})，强制FINISH")
+            last_content = ""
+            for entry in reversed(self.memory_stack.get_all()):
+                if entry.content:
+                    last_content = entry.content
+                    break
+            return CentralDecision(
+                action=CentralAgentAction.FINISH,
+                reasoning=last_content or "决策迭代次数超限，基于已有信息完成任务",
+                params={},
+                instruction="Task completed (max iterations reached)",
+            )
 
         # 增加 SOP 部分，用于加入 decision 模块
         # SOP改成中文，SOP应该要的是抽象的。不能写是outline，replanner，具体谁来生成是让 CentralAgent 自己找
@@ -929,6 +945,10 @@ class CentralAgent:
 
         logger.info(report_msg)
         logger.info(global_statistics.get_statistics())
+        if self._graph_format in ("xxqg", "sp_xxqg"):
+            goto_target = "zip_data"
+        else:
+            goto_target = END
         return Command(
-            goto="zip_data",  # 结束执行
+            goto=goto_target,
         )
