@@ -345,8 +345,15 @@ if the **current action** is **SUMMARIZE**, condense information based on {{summ
 
 # CRITICAL LANGUAGE POLICY
 
+{% if locale and locale.startswith("en") %}
+1. All explanatory, descriptive, summarizing, and analytical natural language output **must be written in English**.
+2. **All `instruction` texts within action fields must also be written in English**, regardless of whether the action is THINK, REFLECT, SUMMARIZE, DELEGATE, or FINISH.
+3. The following elements must remain in English and **must not be translated**: control keywords, action names, agent types, JSON field names, enum values, and schema-related tokens.
+4. DO NOT output Chinese or any other non-English natural language.
+{% else %}
 1. All explanatory, descriptive, summarizing, and analytical natural language output **must be written in Chinese**.  
 2. **All `instruction` texts within action fields must also be written in Chinese**, regardless of whether the action is THINK, REFLECT, SUMMARIZE, DELEGATE, or FINISH.  
 3. The following elements must remain in English and **must not be translated**: control keywords, action names, agent types, JSON field names, enum values, and schema-related tokens.  
 4. If an `instruction` involves technical identifiers or JSON parameters, it should describe the operation intent in Chinese, while keeping the technical identifiers in English.  
 5. DO NOT output English natural language anywhere except for the technical identifiers specified above.
+{% endif %}
