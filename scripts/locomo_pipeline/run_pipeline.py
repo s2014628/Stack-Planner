@@ -88,6 +88,8 @@ def main():
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-per-conv", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
+    parser.add_argument("--concurrency", type=int, default=1,
+                        help="Number of samples to process in parallel (default: 1). Uses multiprocessing.")
     parser.add_argument("--skip-benchmark", action="store_true", help="Skip benchmark run, use existing results")
     parser.add_argument("--skip-summary", action="store_true", help="Skip summary generation")
     parser.add_argument(
@@ -119,6 +121,7 @@ def main():
     print(f"Runs per QA: {args.num_runs}")
     print(f"Temperature: {args.temperature}")
     print(f"Categories filter: {args.categories}")
+    print(f"Concurrency: {args.concurrency}")
     print("=" * 60)
 
     print("\n[Step 1] Loading LoCoMo data...")
@@ -148,6 +151,7 @@ def main():
                 temperature=args.temperature,
                 output_dir=run_dir,
                 resume=not args.no_resume,
+                concurrency=args.concurrency,
             )
         )
         with open(benchmark_results_file, "w", encoding="utf-8") as f:

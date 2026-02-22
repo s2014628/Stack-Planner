@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
 from typing import Any, Dict, List
 
@@ -13,6 +14,7 @@ from src.utils.logger import logger
 
 RUNS_PER_QA = 10
 TEMPERATURE = 0.8
+DEFAULT_CONCURRENCY = 1
 
 
 def set_temperature(temperature: float):
@@ -157,12 +159,23 @@ async def run_benchmark_for_sample(
     }
 
 
+def _run_sample_worker(args):
+    sample, num_runs, temperature = args
+    return asyncio.run(run_benchmark_for_sample(sample, num_runs, temperature))
+
+
+def _save_checkpoint(all_results, checkpoint_file):
+    with open(checkpoint_file, "w", encoding="utf-8") as f:
+        json.dump(all_results, f, ensure_ascii=False, indent=2)
+
+
 async def run_benchmark_batch(
     samples: List[Dict[str, Any]],
     num_runs: int = RUNS_PER_QA,
     temperature: float = TEMPERATURE,
     output_dir: str = "./results/locomo",
     resume: bool = True,
+    concurrency: int = DEFAULT_CONCURRENCY,
 ) -> List[Dict[str, Any]]:
     os.makedirs(output_dir, exist_ok=True)
     checkpoint_file = os.path.join(output_dir, "checkpoint.json")
@@ -178,22 +191,63 @@ async def run_benchmark_batch(
 
     all_results = list(completed.values())
 
-    for idx, sample in enumerate(samples):
+    pending_samples = []
+    for sample in samples:
         key = f"{sample['sample_id']}_{sample['qa_index']}"
         if key in completed:
-            logger.info(f"Skipping {key} (already completed)")
             continue
+        pending_samples.append(sample)
 
-        logger.info(f"Processing [{idx+1}/{len(samples)}]: {key}")
-        result = await run_benchmark_for_sample(sample, num_runs, temperature)
-        all_results.append(result)
+    if not pending_samples:
+        logger.info("All samples already completed")
+        return all_results
 
-        with open(checkpoint_file, "w", encoding="utf-8") as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
+    total_pending = len(pending_samples)
+    logger.info(f"{total_pending} samples to process, concurrency={concurrency}")
 
-        intermediate_file = os.path.join(output_dir, f"{key}_result.json")
-        with open(intermediate_file, "w", encoding="utf-8") as f:
-            json.dump(result, f, ensure_ascii=False, indent=2)
+    if concurrency <= 1:
+        for idx, sample in enumerate(pending_samples):
+            key = f"{sample['sample_id']}_{sample['qa_index']}"
+            logger.info(f"Processing [{idx+1}/{total_pending}]: {key}")
+            result = await run_benchmark_for_sample(sample, num_runs, temperature)
+            all_results.append(result)
+
+            _save_checkpoint(all_results, checkpoint_file)
+
+            intermediate_file = os.path.join(output_dir, f"{key}_result.json")
+            with open(intermediate_file, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+    else:
+        logger.info(f"Using ProcessPoolExecutor with {concurrency} workers")
+        work_items = [(s, num_runs, temperature) for s in pending_samples]
+        done_count = 0
+
+        with ProcessPoolExecutor(max_workers=concurrency) as executor:
+            future_to_sample = {}
+            for item in work_items:
+                future = executor.submit(_run_sample_worker, item)
+                key = f"{item[0]['sample_id']}_{item[0]['qa_index']}"
+                future_to_sample[future] = (key, item[0])
+
+            for future in as_completed(future_to_sample):
+                key, sample = future_to_sample[future]
+                done_count += 1
+                try:
+                    result = future.result()
+                except Exception as e:
+                    logger.error(f"Sample {key} failed: {e}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    continue
+
+                logger.info(f"Completed [{done_count}/{total_pending}]: {key}")
+                all_results.append(result)
+
+                _save_checkpoint(all_results, checkpoint_file)
+
+                intermediate_file = os.path.join(output_dir, f"{key}_result.json")
+                with open(intermediate_file, "w", encoding="utf-8") as f:
+                    json.dump(result, f, ensure_ascii=False, indent=2)
 
     return all_results
 
@@ -210,6 +264,8 @@ if __name__ == "__main__":
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-samples", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
+    parser.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY,
+                        help="Number of samples to process in parallel (default: 1)")
     args = parser.parse_args()
 
     data = load_locomo_data(args.data_path)
@@ -223,6 +279,7 @@ if __name__ == "__main__":
             temperature=args.temperature,
             output_dir=args.output_dir,
             resume=not args.no_resume,
+            concurrency=args.concurrency,
         )
     )
 
