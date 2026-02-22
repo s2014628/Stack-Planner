@@ -444,6 +444,7 @@ class CentralAgent:
         human_interaction_type = state.get("human_interaction_type", "")
         hitl_feedback = state.get("hitl_feedback", "")
 
+        action_options = list(CentralAgentAction)
         context = {
             "available_actions": [a.value for a in action_options],
             "available_sub_agents": self.available_sub_agents,
