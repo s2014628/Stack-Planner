@@ -957,7 +957,11 @@ class CentralAgent:
             goto_target = END
         return Command(
             update={
+<<<<<<< Updated upstream
                 "final_report": final_report,
+=======
+                "final_report": final_report or "",
+>>>>>>> Stashed changes
                 "memory_stack": json.dumps(
                     [entry.to_dict() for entry in self.memory_stack.get_all()]
                 ),
