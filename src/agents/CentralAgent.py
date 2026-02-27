@@ -913,10 +913,15 @@ class CentralAgent:
                     goto="reporter",
                 )
             else:
-                logger.info("Reporter不可用，尝试从reasoning中提取简洁答案")
-                final_report = self._extract_concise_answer(
-                    decision.reasoning, state
-                )
+                answer_from_params = (decision.params or {}).get("answer", "")
+                if answer_from_params:
+                    logger.info("Reporter不可用，使用params.answer作为最终答案")
+                    final_report = answer_from_params
+                else:
+                    logger.info("Reporter不可用，尝试从reasoning中提取简洁答案")
+                    final_report = self._extract_concise_answer(
+                        decision.reasoning, state
+                    )
         logger.info(f"final_report: {final_report}")
 
         # 构建执行摘要（包含完整记忆栈历史）
@@ -951,5 +956,11 @@ class CentralAgent:
         else:
             goto_target = END
         return Command(
+            update={
+                "final_report": final_report,
+                "memory_stack": json.dumps(
+                    [entry.to_dict() for entry in self.memory_stack.get_all()]
+                ),
+            },
             goto=goto_target,
         )

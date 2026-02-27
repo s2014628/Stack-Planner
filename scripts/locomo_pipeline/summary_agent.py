@@ -120,20 +120,47 @@ class SummaryAgent:
             "summary": summary,
         }
 
+    def _summarize_one(self, idx_and_result):
+        idx, total, qa_result = idx_and_result
+        sample_id = qa_result.get("sample_id", "?")
+        qa_index = qa_result.get("qa_index", "?")
+        print(f"Summarizing [{idx+1}/{total}]: {sample_id} qa={qa_index}")
+        summary = self.summarize_qa_runs(qa_result)
+        return {
+            "sample_id": qa_result.get("sample_id", ""),
+            "qa_index": qa_result.get("qa_index", 0),
+            "category": qa_result.get("category", 0),
+            "question": qa_result.get("question", ""),
+            "ground_truth": qa_result.get("ground_truth", ""),
+            **summary,
+        }
+
     def summarize_batch(
         self,
         results: List[Dict[str, Any]],
+        concurrency: int = 1,
     ) -> List[Dict[str, Any]]:
+        total = len(results)
+        work_items = [(idx, total, r) for idx, r in enumerate(results)]
+
+        if concurrency <= 1:
+            return [self._summarize_one(item) for item in work_items]
+
+        from concurrent.futures import ThreadPoolExecutor, as_completed
         summaries = []
-        for idx, qa_result in enumerate(results):
-            print(f"Summarizing [{idx+1}/{len(results)}]: {qa_result.get('sample_id', '?')} qa={qa_result.get('qa_index', '?')}")
-            summary = self.summarize_qa_runs(qa_result)
-            summaries.append({
-                "sample_id": qa_result.get("sample_id", ""),
-                "qa_index": qa_result.get("qa_index", 0),
-                "category": qa_result.get("category", 0),
-                "question": qa_result.get("question", ""),
-                "ground_truth": qa_result.get("ground_truth", ""),
-                **summary,
-            })
+        print(f"Summarizing with {concurrency} threads...")
+        with ThreadPoolExecutor(max_workers=concurrency) as executor:
+            future_to_idx = {}
+            for item in work_items:
+                future = executor.submit(self._summarize_one, item)
+                future_to_idx[future] = item[0]
+
+            for future in as_completed(future_to_idx):
+                try:
+                    result = future.result()
+                    summaries.append(result)
+                except Exception as e:
+                    idx = future_to_idx[future]
+                    print(f"Summary failed for index {idx}: {e}")
+
         return summaries
