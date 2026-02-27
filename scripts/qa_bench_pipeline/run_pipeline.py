@@ -168,7 +168,10 @@ def main():
         help=f"Datasets to process (default: all). Options: {ALL_DATASETS}",
     )
     parser.add_argument(
-        "--split", type=str, default="test", help="Dataset split to use (default: test)"
+        "--split",
+        type=str,
+        default="train",
+        help="Dataset split to use (default: train)",
     )
     parser.add_argument(
         "--output-dir",
