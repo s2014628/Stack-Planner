@@ -185,7 +185,7 @@ def main():
             api_key=args.summary_api_key,
             model=args.summary_model,
         )
-        summaries = summary_agent.summarize_batch(benchmark_results)
+        summaries = summary_agent.summarize_batch(benchmark_results, concurrency=args.concurrency)
 
         summaries_file = os.path.join(run_dir, "summaries.json")
         with open(summaries_file, "w", encoding="utf-8") as f:
