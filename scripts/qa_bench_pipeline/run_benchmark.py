@@ -364,7 +364,7 @@ if __name__ == "__main__":
         default=None,
         help="Datasets to benchmark (default: all)",
     )
-    parser.add_argument("--split", type=str, default="test")
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument("--output-dir", type=str, default="./results/qa_bench")
     parser.add_argument("--num-runs", type=int, default=RUNS_PER_QA)
     parser.add_argument("--temperature", type=float, default=TEMPERATURE)

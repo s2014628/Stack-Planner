@@ -32,7 +32,7 @@ EXPERIENCE_TYPE_MAP = {
 
 
 def load_triviaqa(
-    split: str = "validation", max_samples: Optional[int] = None
+    split: str = "train", max_samples: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """
     Load TriviaQA dataset.
@@ -82,15 +82,20 @@ def load_triviaqa(
 
 
 def load_popqa(
-    split: str = "test", max_samples: Optional[int] = None
+    split: str = "test",
+    max_samples: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """
     Load PopQA dataset.
     PopQA contains factual questions about popular entities.
     Uses search agent pattern for knowledge retrieval.
 
+    Note: PopQA only has a "test" split on HuggingFace.
+    The split parameter is accepted for interface consistency but
+    always falls back to "test".
+
     Args:
-        split: Dataset split to use ("test")
+        split: Dataset split (ignored - PopQA only has "test")
         max_samples: Maximum number of samples to load (None for all)
 
     Returns:
@@ -98,7 +103,9 @@ def load_popqa(
     """
     from datasets import load_dataset
 
-    ds = load_dataset("akariasai/PopQA", split=split)
+    # PopQA only has a "test" split on HuggingFace
+    actual_split = "test"
+    ds = load_dataset("akariasai/PopQA", split=actual_split)
     samples = []
 
     for idx, example in enumerate(ds):
@@ -218,7 +225,7 @@ def load_gpqa(
 
 
 def load_gsm8k(
-    split: str = "test", max_samples: Optional[int] = None
+    split: str = "train", max_samples: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """
     Load GSM8K dataset (Grade School Math 8K).
@@ -271,7 +278,7 @@ def load_gsm8k(
 
 
 def load_math(
-    split: str = "test", max_samples: Optional[int] = None
+    split: str = "train", max_samples: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """
     Load MATH dataset (Competition Mathematics).
@@ -287,11 +294,17 @@ def load_math(
     """
     from datasets import load_dataset
 
-    # Try lighteval/MATH first, fallback to hendrycks/competition_math
+    # hendrycks/competition_math has been DMCA taken down.
+    # Use nlile/hendrycks-MATH-benchmark (has 'answer' field) as primary,
+    # fallback to EleutherAI/hendrycks_math (per-subject subsets).
     try:
-        ds = load_dataset("lighteval/MATH", split=split)
+        ds = load_dataset("nlile/hendrycks-MATH-benchmark", split=split)
     except Exception:
-        ds = load_dataset("hendrycks/competition_math", split=split)
+        try:
+            ds = load_dataset("lighteval/MATH", split=split)
+        except Exception:
+            # EleutherAI version has per-subject subsets; load algebra as default
+            ds = load_dataset("EleutherAI/hendrycks_math", "algebra", split=split)
 
     samples = []
 
@@ -303,7 +316,10 @@ def load_math(
         solution = example["solution"].strip()
 
         # Extract boxed answer from solution
-        ground_truth = _extract_boxed_answer(solution)
+        # nlile/hendrycks-MATH-benchmark has a direct 'answer' field
+        ground_truth = example.get("answer", "") or ""
+        if not ground_truth:
+            ground_truth = _extract_boxed_answer(solution)
         if not ground_truth:
             ground_truth = solution  # fallback to full solution
 
@@ -480,7 +496,7 @@ if __name__ == "__main__":
         default=None,
         help=f"Datasets to load (default: all). Options: {ALL_DATASETS}",
     )
-    parser.add_argument("--split", type=str, default="test")
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument("--max-samples", type=int, default=None)
     parser.add_argument(
         "--output-path", type=str, default="./data/qa_bench_samples.json"
