@@ -23,7 +23,7 @@ class MemoryStack:
     def push_with_pop(self, entry: MemoryStackEntry, topk=1) -> None:
         """先弹出栈顶再推入新条目，用于更新最新记忆"""
         if self.stack:
-            for i in range(topk):
+            for i in range(min(topk, len(self.stack))):
                 self.stack.pop()
         self.push(entry)
 

@@ -1,5 +1,6 @@
 
 
+.DS_Store
 test_llm.py
 ./*.txt
 CHANGELOG.md
