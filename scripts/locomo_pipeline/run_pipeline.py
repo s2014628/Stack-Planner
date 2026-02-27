@@ -1,4 +1,5 @@
 import asyncio
+import glob
 import json
 import os
 import sys
@@ -109,8 +110,17 @@ def main():
     )
     args = parser.parse_args()
 
-    run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = os.path.join(args.output_dir, f"run_{run_timestamp}")
+    if args.no_resume:
+        run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        run_dir = os.path.join(args.output_dir, f"run_{run_timestamp}")
+    else:
+        existing_runs = sorted(glob.glob(os.path.join(args.output_dir, "run_*")))
+        if existing_runs:
+            run_dir = existing_runs[-1]
+            print(f"Resuming from existing run directory: {run_dir}")
+        else:
+            run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            run_dir = os.path.join(args.output_dir, f"run_{run_timestamp}")
     os.makedirs(run_dir, exist_ok=True)
 
     print("=" * 60)
