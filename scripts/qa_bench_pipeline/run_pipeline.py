@@ -212,7 +212,7 @@ def main():
     parser.add_argument(
         "--summary-api-key",
         type=str,
-        default=os.getenv("SUMMARY_API_KEY", ""),
+        default=os.getenv("SUMMARY_API_KEY", "sk-7374e2abda1141ffa4fe8eb01ae582f7"),
     )
     parser.add_argument(
         "--summary-model",
