@@ -159,6 +159,31 @@ def build_locomo_graph():
     return builder.compile()
 
 
+def build_qa_bench_graph():
+    """
+    构建QA Bench专用的状态图。
+    使用CentralAgent + Researcher(Search Agent)流程，支持网络搜索辅助回答。
+    用于 TriviaQA, PopQA, GPQA, GSM8K, MATH 等 QA benchmark 的经验数据生成。
+
+    Returns:
+        编译后的状态图对象
+    """
+    from langgraph.graph import StateGraph, START, END
+
+    builder = StateGraph(State)
+
+    builder.add_node("central_agent", central_agent_node)
+
+    sub_agents = get_sub_agents_by_global_type("qa_bench")
+    for sub_agent in sub_agents:
+        builder.add_node(sub_agent["name"], sub_agent["node"])
+
+    builder.add_edge(START, "central_agent")
+    builder.add_edge("central_agent", END)
+
+    return builder.compile()
+
+
 def get_next_perception(state: State) -> str:
     wait_stage = state.get("wait_stage", "")
     if wait_stage == "perception":
@@ -249,6 +274,7 @@ base_graph = build_graph()
 sp_graph = build_multi_agent_graph()
 xxqg_graph = build_graph_xxqg()
 locomo_graph = build_locomo_graph()
+qa_bench_graph = build_qa_bench_graph()
 
 
 def build_graph_with_memory_from_builder(builder):
@@ -270,6 +296,7 @@ _GRAPH_BUILDER_CLASS_MAP = {
     "xxqg": None,
     "sp_xxqg": sp_xxqg_graph_builder,
     "locomo": None,
+    "qa_bench": None,
 }
 
 _GRAPH_CLASS_MAP = {
@@ -278,6 +305,7 @@ _GRAPH_CLASS_MAP = {
     "xxqg": {"memory": None, "no_memory": xxqg_graph},
     "sp_xxqg": {"memory": None, "no_memory": sp_xxqg_graph_builder.compile()},
     "locomo": {"memory": None, "no_memory": locomo_graph},
+    "qa_bench": {"memory": None, "no_memory": qa_bench_graph},
 }
 
 
