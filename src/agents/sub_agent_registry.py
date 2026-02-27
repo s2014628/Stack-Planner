@@ -108,6 +108,20 @@ sub_agents_locomo = [
 ]
 
 
+# QA Bench 子Agent列表：使用 central agent + researcher (search agent)
+# 用于 TriviaQA, PopQA, GPQA, GSM8K, MATH 等 QA benchmark 的经验数据生成
+# 与 locomo 不同，qa_bench 启用 researcher 子Agent 进行网络搜索辅助回答
+sub_agents_qa_bench = [
+    {
+        "name": SubAgentType.RESEARCHER.value,
+        "description": "Information collection and web search for answering factual and reasoning questions. "
+        "Used to retrieve relevant knowledge, verify facts, and gather supplementary information "
+        "needed to answer QA benchmark questions (TriviaQA, PopQA, GPQA, GSM8K, MATH).",
+        "node": researcher_node,
+    },
+]
+
+
 def get_sub_agents_by_global_type(graph_type: str):
     """
     根据图类型返回可用的子Agent列表
@@ -122,5 +136,7 @@ def get_sub_agents_by_global_type(graph_type: str):
         return sub_agents_sp_xxqg
     elif graph_type == "locomo":
         return sub_agents_locomo
+    elif graph_type == "qa_bench":
+        return sub_agents_qa_bench
     else:
         raise ValueError(f"Unknown graph type: {graph_type}")
