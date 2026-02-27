@@ -84,15 +84,18 @@ def load_triviaqa(
 def load_popqa(
     split: str = "test",
     max_samples: Optional[int] = None,
-    # PopQA only has a "test" split on HuggingFace
 ) -> List[Dict[str, Any]]:
     """
     Load PopQA dataset.
     PopQA contains factual questions about popular entities.
     Uses search agent pattern for knowledge retrieval.
 
+    Note: PopQA only has a "test" split on HuggingFace.
+    The split parameter is accepted for interface consistency but
+    always falls back to "test".
+
     Args:
-        split: Dataset split to use ("test")
+        split: Dataset split (ignored - PopQA only has "test")
         max_samples: Maximum number of samples to load (None for all)
 
     Returns:
@@ -100,7 +103,9 @@ def load_popqa(
     """
     from datasets import load_dataset
 
-    ds = load_dataset("akariasai/PopQA", split=split)
+    # PopQA only has a "test" split on HuggingFace
+    actual_split = "test"
+    ds = load_dataset("akariasai/PopQA", split=actual_split)
     samples = []
 
     for idx, example in enumerate(ds):
