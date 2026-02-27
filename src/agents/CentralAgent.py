@@ -494,7 +494,9 @@ class CentralAgent:
                     ],
                     "locale": state.get("locale"),
                     "current_node": "central_agent",
-                    "memory_stack": self.memory_stack.to_dict(),
+                    "memory_stack": json.dumps(
+                        [entry.to_dict() for entry in self.memory_stack.get_all()]
+                    ),
                 },
                 goto="central_agent",
             )
@@ -690,7 +692,21 @@ class CentralAgent:
         messages = apply_prompt_template("central_agent", state, extra_context=context)
 
         llm = get_llm_by_type(AGENT_LLM_MAP.get("central_agent", "default"))
-        response = llm.invoke(messages)
+        try:
+            response = llm.invoke(messages)
+        except Exception as e:
+            logger.error(f"SUMMARIZE LLM调用失败: {e}")
+            return Command(
+                update={
+                    "messages": [AIMessage(content=f"总结执行失败: {e}", name="central_summarize")],
+                    "current_node": "central_agent",
+                    "memory_stack": json.dumps(
+                        [entry.to_dict() for entry in self.memory_stack.get_all()]
+                    ),
+                    "locale": state.get("locale"),
+                },
+                goto="central_agent",
+            )
 
         # 更新记忆栈，替换最新的总结结果
         new_entry = MemoryStackEntry(
