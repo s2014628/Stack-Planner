@@ -48,6 +48,12 @@ def main():
         type=str,
         default=os.getenv("SUMMARY_MODEL", DEFAULT_SUMMARY_MODEL),
     )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=5,
+        help="Number of summaries to generate in parallel (default: 5)",
+    )
     args = parser.parse_args()
 
     run_dir = args.run_dir
@@ -79,7 +85,7 @@ def main():
         api_key=args.summary_api_key,
         model=args.summary_model,
     )
-    summaries = summary_agent.summarize_batch(evaluated_results)
+    summaries = summary_agent.summarize_batch(evaluated_results, concurrency=args.concurrency)
 
     summaries_file = os.path.join(run_dir, "summaries.json")
     with open(summaries_file, "w", encoding="utf-8") as f:
