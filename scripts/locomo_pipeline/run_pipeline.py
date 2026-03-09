@@ -12,7 +12,11 @@ from scripts.locomo_pipeline.data_loader import (
     extract_qa_samples,
     save_samples,
 )
-from scripts.locomo_pipeline.run_benchmark import run_benchmark_batch
+from scripts.locomo_pipeline.run_benchmark import (
+    run_benchmark_batch,
+    DEFAULT_SAMPLE_CONCURRENCY,
+    DEFAULT_RUN_CONCURRENCY,
+)
 from scripts.locomo_pipeline.evaluator import evaluate_runs
 from scripts.locomo_pipeline.summary_agent import SummaryAgent
 
@@ -88,10 +92,32 @@ def main():
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-per-conv", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
-    parser.add_argument("--concurrency", type=int, default=1,
-                        help="Number of samples to process in parallel (default: 1). Uses multiprocessing.")
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=DEFAULT_SAMPLE_CONCURRENCY,
+        help=(
+            "Number of samples to process in parallel "
+            f"(default: {DEFAULT_SAMPLE_CONCURRENCY})"
+        ),
+    )
+    parser.add_argument(
+        "--run-concurrency",
+        type=int,
+        default=DEFAULT_RUN_CONCURRENCY,
+        help=(
+            "Number of runs per sample in parallel "
+            f"(default: {DEFAULT_RUN_CONCURRENCY})"
+        ),
+    )
     parser.add_argument("--skip-benchmark", action="store_true", help="Skip benchmark run, use existing results")
     parser.add_argument("--skip-summary", action="store_true", help="Skip summary generation")
+    parser.add_argument(
+        "--summary-concurrency",
+        type=int,
+        default=5,
+        help="Number of summaries to generate in parallel (default: 5)",
+    )
     parser.add_argument(
         "--summary-base-url",
         type=str,
@@ -121,7 +147,8 @@ def main():
     print(f"Runs per QA: {args.num_runs}")
     print(f"Temperature: {args.temperature}")
     print(f"Categories filter: {args.categories}")
-    print(f"Concurrency: {args.concurrency}")
+    print(f"Sample concurrency: {args.concurrency}")
+    print(f"Run concurrency: {args.run_concurrency}")
     print("=" * 60)
 
     print("\n[Step 1] Loading LoCoMo data...")
@@ -152,6 +179,7 @@ def main():
                 output_dir=run_dir,
                 resume=not args.no_resume,
                 concurrency=args.concurrency,
+                run_concurrency=args.run_concurrency,
             )
         )
         with open(benchmark_results_file, "w", encoding="utf-8") as f:
@@ -185,7 +213,7 @@ def main():
             api_key=args.summary_api_key,
             model=args.summary_model,
         )
-        summaries = summary_agent.summarize_batch(benchmark_results, concurrency=args.concurrency)
+        summaries = summary_agent.summarize_batch(benchmark_results, concurrency=args.summary_concurrency)
 
         summaries_file = os.path.join(run_dir, "summaries.json")
         with open(summaries_file, "w", encoding="utf-8") as f:

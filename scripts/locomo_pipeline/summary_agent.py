@@ -138,8 +138,18 @@ class SummaryAgent:
     def summarize_batch(
         self,
         results: List[Dict[str, Any]],
-        concurrency: int = 1,
+        concurrency: int = 5,
     ) -> List[Dict[str, Any]]:
+        """Summarize a batch of QA results.
+
+        Args:
+            results: List of evaluated QA results
+            concurrency: Number of summaries to generate in parallel.
+                         Default is 5 since this is purely I/O-bound (API calls).
+
+        Returns:
+            List of summary dicts
+        """
         total = len(results)
         work_items = [(idx, total, r) for idx, r in enumerate(results)]
 
