@@ -1,8 +1,11 @@
 """
 QA Bench Pipeline - Run Benchmark (Optimized)
 
-Execute QA benchmark samples through the Stack-Planner multi-agent system
-using central agent + researcher (search agent).
+Execute QA benchmark samples through the Stack-Planner multi-agent system.
+
+For factual datasets (TriviaQA, PopQA, GPQA) the graph includes a
+researcher (search agent).  For pure-reasoning datasets (GSM8K, MATH)
+the graph contains only the central agent -- no web search is performed.
 
 Concurrency model:
 - Level 1 (sample concurrency): multiple samples processed in parallel
@@ -24,7 +27,11 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from scripts.qa_bench_pipeline.data_loader import NO_SEARCH_DATASETS
 from src.utils.logger import logger
+
+# Frozen set for O(1) lookup in hot path
+_NO_SEARCH_DATASETS = frozenset(NO_SEARCH_DATASETS)
 
 RUNS_PER_QA = 10
 TEMPERATURE = 0.8
@@ -169,6 +176,49 @@ def _create_isolated_qa_bench_graph():
     return builder.compile()
 
 
+def _create_isolated_reasoning_graph():
+    """
+    Create a fully isolated reasoning-only graph (no researcher / search).
+
+    Used for datasets like GSM8K and MATH where web search adds no value.
+    The graph only contains a central_agent node that reasons through the
+    problem on its own.
+
+    Each invocation creates:
+    - A fresh CentralAgent (graph_format="qa_bench_reasoning") with its own
+      memory_stack and _decision_count
+    - Node functions that close over the isolated instance
+    - A compiled StateGraph (central_agent only, no researcher)
+
+    Returns:
+        A compiled LangGraph StateGraph with isolated agent state.
+    """
+    from langchain_core.runnables import RunnableConfig
+    from langgraph.graph import END, START, StateGraph
+    from langgraph.types import Command
+
+    from src.agents.CentralAgent import CentralAgent
+    from src.graph.types import State
+
+    # Create isolated agent instance with no researcher sub-agents
+    central_agent = CentralAgent(graph_format="qa_bench_reasoning")
+
+    async def isolated_central_agent_node(
+        state: State, config: RunnableConfig
+    ) -> Command:
+        """Central agent node bound to an isolated CentralAgent instance."""
+        decision = central_agent.make_decision(state, config)
+        return central_agent.execute_action(decision, state, config)
+
+    # --- Build the graph (central_agent only, no researcher) ---
+    builder = StateGraph(State)
+    builder.add_node("central_agent", isolated_central_agent_node)
+    builder.add_edge(START, "central_agent")
+    builder.add_edge("central_agent", END)
+
+    return builder.compile()
+
+
 async def _run_graph(
     question: str,
     dataset: str,
@@ -191,7 +241,9 @@ async def _run_graph(
     Returns:
         Dict with prediction and memory_stack_log
     """
-    # Build task message based on experience type
+    # Build task message based on experience type and whether search is available
+    use_search = dataset not in _NO_SEARCH_DATASETS
+
     if experience_type == "factual":
         task_message = (
             f"You must respond with a Decision JSON object. "
@@ -205,8 +257,25 @@ async def _run_graph(
             f"in the reasoning field. "
             f"You MUST respond in English. Set locale to 'en' in your JSON response."
         )
+    elif not use_search:
+        # Pure reasoning datasets (GSM8K, MATH): no search, solve by reasoning
+        task_message = (
+            f"You must respond with a Decision JSON object. "
+            f"This is a math/reasoning problem from the {dataset} benchmark. "
+            f"You do NOT have access to any search tools. "
+            f"Solve this problem step by step using your own reasoning ability. "
+            f"Use 'think' actions to work through the problem, then 'finish' "
+            f"with your final answer.\n\n"
+            f"The problem to solve is: {question}\n\n"
+            f"IMPORTANT: Your response MUST be a JSON object with fields: "
+            f"action, reasoning, params, instruction, locale. "
+            f"Do NOT answer the question directly in your first response. "
+            f"Choose an action (think/finish) and put your step-by-step "
+            f"reasoning in the reasoning field. "
+            f"You MUST respond in English. Set locale to 'en' in your JSON response."
+        )
     else:
-        # SOP type: GPQA, GSM8K, MATH
+        # SOP type with search: GPQA
         task_message = (
             f"You must respond with a Decision JSON object. "
             f"This is a reasoning question from the {dataset} benchmark. "
@@ -233,7 +302,7 @@ async def _run_graph(
     config = {
         "configurable": {
             "thread_id": f"qa_bench_{dataset}_{datetime.now().timestamp()}",
-            "graph_format": "qa_bench",
+            "graph_format": "qa_bench_reasoning" if not use_search else "qa_bench",
             "max_plan_iterations": 1,
             "max_step_num": 5,
             "mcp_settings": {},
@@ -306,8 +375,12 @@ async def run_single_qa(
     start_time = time.time()
     error_msg = None
     try:
-        # Each run gets a fresh isolated graph (own CentralAgent + memory_stack)
-        graph = _create_isolated_qa_bench_graph()
+        # Each run gets a fresh isolated graph (own CentralAgent + memory_stack).
+        # For no-search datasets use the reasoning-only graph (no researcher).
+        if dataset in _NO_SEARCH_DATASETS:
+            graph = _create_isolated_reasoning_graph()
+        else:
+            graph = _create_isolated_qa_bench_graph()
         result = await _run_graph(question, dataset, experience_type, graph)
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])

@@ -3,7 +3,7 @@ QA Bench Experience Data Pipeline
 
 End-to-end pipeline for generating experience data from QA benchmarks:
 1. Load QA samples from specified datasets
-2. Run benchmark through central agent + search agent
+2. Run benchmark through central agent (+ search agent for factual/GPQA datasets)
 3. Evaluate results with per-dataset metrics
 4. Generate experience summaries (factual + SOP)
 5. Build final experience data (classified by experience type)
@@ -48,6 +48,7 @@ from scripts.qa_bench_pipeline.data_loader import (
     ALL_DATASETS,
     FACTUAL_DATASETS,
     SOP_DATASETS,
+    NO_SEARCH_DATASETS,
 )
 from scripts.qa_bench_pipeline.run_benchmark import (
     run_benchmark_batch,
@@ -450,8 +451,12 @@ def main():
     print(f"Run concurrency: {args.run_concurrency}")
     print(f"Search concurrency: {args.search_concurrency}")
     print(f"Dataset parallel: {args.dataset_parallel}")
+    no_search_selected = [d for d in selected_datasets if d in NO_SEARCH_DATASETS]
+    search_selected = [d for d in selected_datasets if d not in NO_SEARCH_DATASETS]
     print(f"Factual datasets: {factual_selected}")
     print(f"SOP datasets: {sop_selected}")
+    print(f"Search-enabled datasets: {search_selected}")
+    print(f"Reasoning-only datasets (no search): {no_search_selected}")
     print("=" * 60)
 
     # ─── Per-dataset pipeline execution ───────────────────────────

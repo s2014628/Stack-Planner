@@ -122,6 +122,13 @@ sub_agents_qa_bench = [
 ]
 
 
+# QA Bench (reasoning-only) 子Agent列表：仅使用 central agent，不启用 researcher
+# 用于 GSM8K, MATH 等纯推理 benchmark，不需要网络搜索
+sub_agents_qa_bench_reasoning = [
+    # No sub-agents: central agent solves problems using its own reasoning
+]
+
+
 def get_sub_agents_by_global_type(graph_type: str):
     """
     根据图类型返回可用的子Agent列表
@@ -138,5 +145,7 @@ def get_sub_agents_by_global_type(graph_type: str):
         return sub_agents_locomo
     elif graph_type == "qa_bench":
         return sub_agents_qa_bench
+    elif graph_type == "qa_bench_reasoning":
+        return sub_agents_qa_bench_reasoning
     else:
         raise ValueError(f"Unknown graph type: {graph_type}")
