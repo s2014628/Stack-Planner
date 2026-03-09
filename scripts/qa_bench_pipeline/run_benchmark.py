@@ -4,12 +4,14 @@ QA Bench Pipeline - Run Benchmark (Optimized)
 Execute QA benchmark samples through the Stack-Planner multi-agent system
 using central agent + researcher (search agent).
 
-Performance optimizations over initial version:
-1. asyncio.Semaphore for sample-level concurrency (replaces ProcessPoolExecutor)
-2. asyncio.gather for parallel runs within a single sample
-3. Agent/graph initialization once per batch, not per run
-4. LLM cache cleared once at start, not per individual run
-5. Higher default concurrency values
+Concurrency model:
+- Level 1 (sample concurrency): multiple samples processed in parallel
+- Level 2 (run concurrency): multiple runs within one sample in parallel
+
+State isolation:
+  Each concurrent run gets its own isolated graph with a fresh CentralAgent
+  and SubAgentManager, so memory_stack / _decision_count never leak between
+  concurrent invocations.
 """
 
 import asyncio
@@ -42,18 +44,55 @@ def _clear_llm_cache():
     _llm_cache.clear()
 
 
-def _init_qa_bench_agents():
-    """Initialize agents with qa_bench graph format (central + researcher)."""
-    from src.graph.sp_nodes import init_agents
+def _create_isolated_qa_bench_graph():
+    """
+    Create a fully isolated qa_bench graph with its own CentralAgent instance.
 
-    init_agents("qa_bench")
+    Each invocation creates:
+    - A fresh CentralAgent with its own memory_stack and _decision_count
+    - A fresh SubAgentManager bound to that CentralAgent
+    - Node functions that close over these isolated instances
+    - A compiled StateGraph
 
+    This ensures concurrent invocations never share mutable state
+    (memory_stack, _decision_count, etc.).
 
-def _get_qa_bench_graph():
-    """Get the compiled qa_bench graph."""
-    from src.graph.builder import qa_bench_graph
+    Returns:
+        A compiled LangGraph StateGraph with isolated agent state.
+    """
+    from langchain_core.runnables import RunnableConfig
+    from langgraph.graph import END, START, StateGraph
+    from langgraph.types import Command
 
-    return qa_bench_graph
+    from src.agents.CentralAgent import CentralAgent
+    from src.agents.SubAgentManager import SubAgentManager
+    from src.graph.types import State
+
+    # Create isolated agent instances (each has its own memory_stack)
+    central_agent = CentralAgent(graph_format="qa_bench")
+    agent_manager = SubAgentManager(central_agent)
+
+    # --- Closure-based node functions that reference isolated instances ---
+
+    async def isolated_central_agent_node(
+        state: State, config: RunnableConfig
+    ) -> Command:
+        """Central agent node bound to an isolated CentralAgent instance."""
+        decision = central_agent.make_decision(state, config)
+        return central_agent.execute_action(decision, state, config)
+
+    async def isolated_researcher_node(state: State, config: RunnableConfig) -> Command:
+        """Researcher node bound to an isolated SubAgentManager instance."""
+        return await agent_manager.execute_researcher(state, config)
+
+    # --- Build the graph ---
+    builder = StateGraph(State)
+    builder.add_node("central_agent", isolated_central_agent_node)
+    builder.add_node("researcher", isolated_researcher_node)
+    builder.add_edge(START, "central_agent")
+    builder.add_edge("central_agent", END)
+
+    return builder.compile()
 
 
 async def _run_graph(
@@ -156,17 +195,16 @@ async def _run_graph(
 async def run_single_qa(
     sample: Dict[str, Any],
     run_id: int,
-    graph,
 ) -> Dict[str, Any]:
     """
     Run a single QA benchmark sample once.
 
-    Note: Agent initialization is handled at batch level, not per run.
+    Creates an isolated graph per invocation to guarantee no shared mutable
+    state (memory_stack, _decision_count) between concurrent runs.
 
     Args:
         sample: Normalized QA sample from data_loader
         run_id: Run iteration number
-        graph: Compiled state graph (required)
 
     Returns:
         Run result dict
@@ -180,6 +218,8 @@ async def run_single_qa(
 
     start_time = time.time()
     try:
+        # Each run gets a fresh isolated graph (own CentralAgent + memory_stack)
+        graph = _create_isolated_qa_bench_graph()
         result = await _run_graph(question, dataset, experience_type, graph)
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])
@@ -207,33 +247,31 @@ async def run_benchmark_for_sample(
     num_runs: int = RUNS_PER_QA,
     temperature: float = TEMPERATURE,
     run_concurrency: int = DEFAULT_RUN_CONCURRENCY,
-    graph=None,
 ) -> Dict[str, Any]:
     """
     Run benchmark for a single sample across multiple runs.
 
     Uses asyncio.gather with a semaphore to run multiple runs concurrently
-    within a single sample, significantly speeding up per-sample execution.
+    within a single sample.  Each run creates its own isolated graph
+    (CentralAgent + SubAgentManager) so memory_stack never leaks between
+    concurrent runs.
 
     Args:
         sample: Normalized QA sample
         num_runs: Number of runs per sample
         temperature: LLM sampling temperature
         run_concurrency: Max concurrent runs within this sample
-        graph: Pre-initialized graph (avoids re-initialization per sample)
 
     Returns:
         Sample result with all runs
     """
     set_temperature(temperature)
-    if graph is None:
-        graph = _get_qa_bench_graph()
 
     run_sem = asyncio.Semaphore(run_concurrency)
 
     async def _guarded_run(rid: int) -> Dict[str, Any]:
         async with run_sem:
-            return await run_single_qa(sample, rid, graph)
+            return await run_single_qa(sample, rid)
 
     # Launch all runs concurrently, bounded by run_sem
     tasks = [_guarded_run(run_id) for run_id in range(1, num_runs + 1)]
@@ -340,11 +378,11 @@ async def run_benchmark_batch(
         f"sample_concurrency={concurrency}, run_concurrency={run_concurrency}"
     )
 
-    # Initialize agents and graph once for the entire batch
+    # Clear LLM cache once and set temperature for the batch.
+    # Each concurrent run creates its own isolated graph (with fresh
+    # CentralAgent + SubAgentManager), so no shared mutable state.
     _clear_llm_cache()
     set_temperature(temperature)
-    _init_qa_bench_agents()
-    graph = _get_qa_bench_graph()
 
     # Use asyncio.Semaphore for sample-level concurrency control
     sample_sem = asyncio.Semaphore(concurrency)
@@ -363,7 +401,6 @@ async def run_benchmark_batch(
                     num_runs,
                     temperature,
                     run_concurrency=run_concurrency,
-                    graph=graph,
                 )
             except Exception as e:
                 logger.error(f"Sample {key} failed: {e}")
