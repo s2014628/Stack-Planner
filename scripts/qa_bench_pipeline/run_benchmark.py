@@ -30,6 +30,27 @@ RUNS_PER_QA = 10
 TEMPERATURE = 0.8
 DEFAULT_SAMPLE_CONCURRENCY = 3
 DEFAULT_RUN_CONCURRENCY = 5
+DEFAULT_SEARCH_CONCURRENCY = 5
+
+# Module-level semaphore that limits how many researcher (search) calls can
+# run concurrently across ALL graph executions.  This prevents hitting
+# search-API rate limits when sample_concurrency * run_concurrency is large.
+_search_semaphore: Optional[asyncio.Semaphore] = None
+
+
+def _get_search_semaphore(
+    max_concurrent: int = DEFAULT_SEARCH_CONCURRENCY,
+) -> asyncio.Semaphore:
+    """Return (and lazily create) the global search semaphore.
+
+    Re-creates the semaphore if ``max_concurrent`` differs from the
+    current one so that callers who pass different values (e.g. via
+    ``--search-concurrency``) are always honoured.
+    """
+    global _search_semaphore
+    if _search_semaphore is None or _search_semaphore._value != max_concurrent:
+        _search_semaphore = asyncio.Semaphore(max_concurrent)
+    return _search_semaphore
 
 
 def set_temperature(temperature: float):
@@ -82,8 +103,36 @@ def _create_isolated_qa_bench_graph():
         return central_agent.execute_action(decision, state, config)
 
     async def isolated_researcher_node(state: State, config: RunnableConfig) -> Command:
-        """Researcher node bound to an isolated SubAgentManager instance."""
-        return await agent_manager.execute_researcher(state, config)
+        """Researcher node bound to an isolated SubAgentManager instance.
+
+        Wraps execute_researcher with:
+        1. A global search semaphore to prevent search-API rate-limit hits.
+        2. Error handling so that tool initialization failures (e.g.
+           missing TAVILY_API_KEY) don't crash the entire graph.
+        """
+        search_sem = _get_search_semaphore()
+        try:
+            async with search_sem:
+                return await agent_manager.execute_researcher(state, config)
+        except Exception as e:
+            from langchain_core.messages import HumanMessage
+
+            logger.error(f"Researcher node failed: {type(e).__name__}: {e}")
+            return Command(
+                update={
+                    "messages": [
+                        HumanMessage(
+                            content=(
+                                f"Research task failed: {type(e).__name__}: {e}. "
+                                "Please answer based on your own knowledge."
+                            ),
+                            name="researcher",
+                        )
+                    ],
+                    "current_node": "central_agent",
+                },
+                goto="central_agent",
+            )
 
     # --- Build the graph ---
     builder = StateGraph(State)
@@ -342,6 +391,7 @@ async def run_benchmark_batch(
     resume: bool = True,
     concurrency: int = DEFAULT_SAMPLE_CONCURRENCY,
     run_concurrency: int = DEFAULT_RUN_CONCURRENCY,
+    search_concurrency: int = DEFAULT_SEARCH_CONCURRENCY,
 ) -> List[Dict[str, Any]]:
     """
     Run benchmark for a batch of QA samples with two-level concurrency.
@@ -350,6 +400,8 @@ async def run_benchmark_batch(
              via asyncio.Semaphore + asyncio.gather.
     Level 2 (run concurrency): Multiple runs within one sample processed
              in parallel via asyncio.Semaphore + asyncio.gather.
+    Level 3 (search concurrency): Global cap on concurrent researcher
+             (search-API) calls to avoid rate-limit errors.
 
     This replaces the previous ProcessPoolExecutor approach, which had
     heavy process-spawning overhead and required re-importing everything.
@@ -362,6 +414,7 @@ async def run_benchmark_batch(
         resume: Whether to resume from checkpoint
         concurrency: Number of samples to process in parallel
         run_concurrency: Number of runs per sample to process in parallel
+        search_concurrency: Max concurrent researcher (search) calls globally
 
     Returns:
         List of all benchmark results
@@ -396,8 +449,12 @@ async def run_benchmark_batch(
     total_pending = len(pending_samples)
     logger.info(
         f"{total_pending} samples to process, "
-        f"sample_concurrency={concurrency}, run_concurrency={run_concurrency}"
+        f"sample_concurrency={concurrency}, run_concurrency={run_concurrency}, "
+        f"search_concurrency={search_concurrency}"
     )
+
+    # Initialise the global search semaphore for this batch
+    _get_search_semaphore(search_concurrency)
 
     # Clear LLM cache once and set temperature for the batch.
     # Each concurrent run creates its own isolated graph (with fresh
@@ -487,6 +544,16 @@ if __name__ == "__main__":
             f"(default: {DEFAULT_RUN_CONCURRENCY})"
         ),
     )
+    parser.add_argument(
+        "--search-concurrency",
+        type=int,
+        default=DEFAULT_SEARCH_CONCURRENCY,
+        help=(
+            "Max concurrent researcher (search) calls globally. "
+            "Lower this if you hit search-API rate limits "
+            f"(default: {DEFAULT_SEARCH_CONCURRENCY})"
+        ),
+    )
     args = parser.parse_args()
 
     samples = load_qa_samples(
@@ -505,6 +572,7 @@ if __name__ == "__main__":
             resume=not args.no_resume,
             concurrency=args.concurrency,
             run_concurrency=args.run_concurrency,
+            search_concurrency=args.search_concurrency,
         )
     )
 

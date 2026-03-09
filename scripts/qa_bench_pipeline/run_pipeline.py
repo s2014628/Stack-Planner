@@ -203,6 +203,15 @@ def main():
         help="Number of runs per sample in parallel (default: 5)",
     )
     parser.add_argument(
+        "--search-concurrency",
+        type=int,
+        default=5,
+        help=(
+            "Max concurrent researcher (search) calls globally. "
+            "Lower this if you hit search-API rate limits (default: 5)"
+        ),
+    )
+    parser.add_argument(
         "--skip-benchmark",
         action="store_true",
         help="Skip benchmark run, use existing results",
@@ -244,6 +253,7 @@ def main():
     print(f"Max samples per dataset: {args.max_samples}")
     print(f"Sample concurrency: {args.concurrency}")
     print(f"Run concurrency: {args.run_concurrency}")
+    print(f"Search concurrency: {args.search_concurrency}")
 
     factual_selected = [d for d in selected_datasets if d in FACTUAL_DATASETS]
     sop_selected = [d for d in selected_datasets if d in SOP_DATASETS]
@@ -281,6 +291,7 @@ def main():
                 resume=not args.no_resume,
                 concurrency=args.concurrency,
                 run_concurrency=args.run_concurrency,
+                search_concurrency=args.search_concurrency,
             )
         )
         with open(benchmark_results_file, "w", encoding="utf-8") as f:

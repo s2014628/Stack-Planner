@@ -24,11 +24,10 @@ def extract_json_from_text(content: str) -> str:
     # Strip <think>...</think> tags (qwen3 etc.)
     content = re.sub(r"<think>[\s\S]*?</think>", "", content).strip()
 
-    # Extract from markdown code blocks
-    code_block_match = re.search(r"```(?:json|ts)?\s*\n?([\s\S]*?)```", content)
-    if code_block_match:
-        extracted = code_block_match.group(1).strip()
-        if extracted:
+    # Extract from markdown code blocks (try all code-block pairs)
+    for m in re.finditer(r"```(?:json|ts)?\s*\n?([\s\S]*?)```", content):
+        extracted = m.group(1).strip()
+        if extracted and extracted not in ("```", "``", "`"):
             return extracted
 
     # Find outermost JSON object {...} via brace matching
@@ -57,7 +56,9 @@ def extract_json_from_text(content: str) -> str:
                 if depth == 0:
                     return content[start_idx : i + 1]
 
-    return content
+    # Last resort: strip stray backticks so callers don't receive bare ```
+    cleaned = re.sub(r"^`+|`+$", "", content).strip()
+    return cleaned if cleaned else content
 
 
 def repair_json_output(content: str) -> str:
