@@ -1,12 +1,15 @@
 """
-QA Bench Pipeline - Run Benchmark
+QA Bench Pipeline - Run Benchmark (Optimized)
 
 Execute QA benchmark samples through the Stack-Planner multi-agent system
 using central agent + researcher (search agent).
 
-Unlike the locomo pipeline which uses only CentralAgent's THINK/FINISH,
-this pipeline leverages the researcher sub-agent for web search to answer
-factual and reasoning questions.
+Performance optimizations over initial version:
+1. asyncio.Semaphore for sample-level concurrency (replaces ProcessPoolExecutor)
+2. asyncio.gather for parallel runs within a single sample
+3. Agent/graph initialization once per batch, not per run
+4. LLM cache cleared once at start, not per individual run
+5. Higher default concurrency values
 """
 
 import asyncio
@@ -14,9 +17,8 @@ import json
 import os
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -24,7 +26,8 @@ from src.utils.logger import logger
 
 RUNS_PER_QA = 10
 TEMPERATURE = 0.8
-DEFAULT_CONCURRENCY = 1
+DEFAULT_SAMPLE_CONCURRENCY = 3
+DEFAULT_RUN_CONCURRENCY = 5
 
 
 def set_temperature(temperature: float):
@@ -153,15 +156,17 @@ async def _run_graph(
 async def run_single_qa(
     sample: Dict[str, Any],
     run_id: int,
-    graph=None,
+    graph,
 ) -> Dict[str, Any]:
     """
     Run a single QA benchmark sample once.
 
+    Note: Agent initialization is handled at batch level, not per run.
+
     Args:
         sample: Normalized QA sample from data_loader
         run_id: Run iteration number
-        graph: Compiled state graph (optional, will be loaded if None)
+        graph: Compiled state graph (required)
 
     Returns:
         Run result dict
@@ -175,11 +180,6 @@ async def run_single_qa(
 
     start_time = time.time()
     try:
-        _clear_llm_cache()
-        _init_qa_bench_agents()
-        if graph is None:
-            graph = _get_qa_bench_graph()
-
         result = await _run_graph(question, dataset, experience_type, graph)
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])
@@ -206,25 +206,56 @@ async def run_benchmark_for_sample(
     sample: Dict[str, Any],
     num_runs: int = RUNS_PER_QA,
     temperature: float = TEMPERATURE,
+    run_concurrency: int = DEFAULT_RUN_CONCURRENCY,
+    graph=None,
 ) -> Dict[str, Any]:
     """
     Run benchmark for a single sample across multiple runs.
+
+    Uses asyncio.gather with a semaphore to run multiple runs concurrently
+    within a single sample, significantly speeding up per-sample execution.
 
     Args:
         sample: Normalized QA sample
         num_runs: Number of runs per sample
         temperature: LLM sampling temperature
+        run_concurrency: Max concurrent runs within this sample
+        graph: Pre-initialized graph (avoids re-initialization per sample)
 
     Returns:
         Sample result with all runs
     """
     set_temperature(temperature)
-    graph = _get_qa_bench_graph()
+    if graph is None:
+        graph = _get_qa_bench_graph()
 
-    runs = []
-    for run_id in range(1, num_runs + 1):
-        result = await run_single_qa(sample, run_id, graph=graph)
-        runs.append(result)
+    run_sem = asyncio.Semaphore(run_concurrency)
+
+    async def _guarded_run(rid: int) -> Dict[str, Any]:
+        async with run_sem:
+            return await run_single_qa(sample, rid, graph)
+
+    # Launch all runs concurrently, bounded by run_sem
+    tasks = [_guarded_run(run_id) for run_id in range(1, num_runs + 1)]
+    runs = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Filter out exceptions and log them
+    valid_runs: List[Dict[str, Any]] = []
+    for i, run in enumerate(runs):
+        if isinstance(run, Exception):
+            logger.error(f"Run {i+1} for {sample['sample_id']} raised exception: {run}")
+            valid_runs.append(
+                {
+                    "run_id": i + 1,
+                    "prediction": "",
+                    "memory_stack_log": [],
+                    "elapsed_seconds": 0,
+                    "timestamp": datetime.now().isoformat(),
+                    "error": str(run),
+                }
+            )
+        else:
+            valid_runs.append(run)
 
     return {
         "sample_id": sample["sample_id"],
@@ -234,14 +265,8 @@ async def run_benchmark_for_sample(
         "ground_truth": sample["ground_truth"],
         "ground_truth_aliases": sample.get("ground_truth_aliases", []),
         "metadata": sample.get("metadata", {}),
-        "runs": runs,
+        "runs": valid_runs,
     }
-
-
-def _run_sample_worker(args):
-    """Worker function for multiprocessing."""
-    sample, num_runs, temperature = args
-    return asyncio.run(run_benchmark_for_sample(sample, num_runs, temperature))
 
 
 def _save_checkpoint(all_results: List[Dict], checkpoint_file: str):
@@ -256,10 +281,19 @@ async def run_benchmark_batch(
     temperature: float = TEMPERATURE,
     output_dir: str = "./results/qa_bench",
     resume: bool = True,
-    concurrency: int = DEFAULT_CONCURRENCY,
+    concurrency: int = DEFAULT_SAMPLE_CONCURRENCY,
+    run_concurrency: int = DEFAULT_RUN_CONCURRENCY,
 ) -> List[Dict[str, Any]]:
     """
-    Run benchmark for a batch of QA samples.
+    Run benchmark for a batch of QA samples with two-level concurrency.
+
+    Level 1 (sample concurrency): Multiple samples processed in parallel
+             via asyncio.Semaphore + asyncio.gather.
+    Level 2 (run concurrency): Multiple runs within one sample processed
+             in parallel via asyncio.Semaphore + asyncio.gather.
+
+    This replaces the previous ProcessPoolExecutor approach, which had
+    heavy process-spawning overhead and required re-importing everything.
 
     Args:
         samples: List of normalized QA samples
@@ -267,7 +301,8 @@ async def run_benchmark_batch(
         temperature: LLM sampling temperature
         output_dir: Directory for output files
         resume: Whether to resume from checkpoint
-        concurrency: Number of parallel workers
+        concurrency: Number of samples to process in parallel
+        run_concurrency: Number of runs per sample to process in parallel
 
     Returns:
         List of all benchmark results
@@ -275,7 +310,7 @@ async def run_benchmark_batch(
     os.makedirs(output_dir, exist_ok=True)
     checkpoint_file = os.path.join(output_dir, "checkpoint.json")
 
-    completed = {}
+    completed: Dict[str, Dict] = {}
     if resume and os.path.exists(checkpoint_file):
         with open(checkpoint_file, "r", encoding="utf-8") as f:
             checkpoint_data = json.load(f)
@@ -300,52 +335,58 @@ async def run_benchmark_batch(
         return all_results
 
     total_pending = len(pending_samples)
-    logger.info(f"{total_pending} samples to process, concurrency={concurrency}")
+    logger.info(
+        f"{total_pending} samples to process, "
+        f"sample_concurrency={concurrency}, run_concurrency={run_concurrency}"
+    )
 
-    if concurrency <= 1:
-        for idx, sample in enumerate(pending_samples):
-            key = sample["sample_id"]
+    # Initialize agents and graph once for the entire batch
+    _clear_llm_cache()
+    set_temperature(temperature)
+    _init_qa_bench_agents()
+    graph = _get_qa_bench_graph()
+
+    # Use asyncio.Semaphore for sample-level concurrency control
+    sample_sem = asyncio.Semaphore(concurrency)
+    # Lock for thread-safe checkpoint writing
+    checkpoint_lock = asyncio.Lock()
+
+    async def _process_sample(
+        idx: int, sample: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        key = sample["sample_id"]
+        async with sample_sem:
             logger.info(f"Processing [{idx+1}/{total_pending}]: {key}")
-            result = await run_benchmark_for_sample(sample, num_runs, temperature)
-            all_results.append(result)
+            try:
+                result = await run_benchmark_for_sample(
+                    sample,
+                    num_runs,
+                    temperature,
+                    run_concurrency=run_concurrency,
+                    graph=graph,
+                )
+            except Exception as e:
+                logger.error(f"Sample {key} failed: {e}")
+                import traceback
 
-            _save_checkpoint(all_results, checkpoint_file)
+                logger.error(traceback.format_exc())
+                return None
+
+            # Save checkpoint and intermediate result
+            async with checkpoint_lock:
+                all_results.append(result)
+                _save_checkpoint(all_results, checkpoint_file)
 
             intermediate_file = os.path.join(output_dir, f"{key}_result.json")
             with open(intermediate_file, "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
-    else:
-        logger.info(f"Using ProcessPoolExecutor with {concurrency} workers")
-        work_items = [(s, num_runs, temperature) for s in pending_samples]
-        done_count = 0
 
-        with ProcessPoolExecutor(max_workers=concurrency) as executor:
-            future_to_sample = {}
-            for item in work_items:
-                future = executor.submit(_run_sample_worker, item)
-                key = item[0]["sample_id"]
-                future_to_sample[future] = (key, item[0])
+            logger.info(f"Completed [{idx+1}/{total_pending}]: {key}")
+            return result
 
-            for future in as_completed(future_to_sample):
-                key, sample = future_to_sample[future]
-                done_count += 1
-                try:
-                    result = future.result()
-                except Exception as e:
-                    logger.error(f"Sample {key} failed: {e}")
-                    import traceback
-
-                    logger.error(traceback.format_exc())
-                    continue
-
-                logger.info(f"Completed [{done_count}/{total_pending}]: {key}")
-                all_results.append(result)
-
-                _save_checkpoint(all_results, checkpoint_file)
-
-                intermediate_file = os.path.join(output_dir, f"{key}_result.json")
-                with open(intermediate_file, "w", encoding="utf-8") as f:
-                    json.dump(result, f, ensure_ascii=False, indent=2)
+    # Launch all samples concurrently, bounded by sample_sem
+    tasks = [_process_sample(idx, sample) for idx, sample in enumerate(pending_samples)]
+    await asyncio.gather(*tasks, return_exceptions=True)
 
     return all_results
 
@@ -373,8 +414,20 @@ if __name__ == "__main__":
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=DEFAULT_CONCURRENCY,
-        help="Number of samples to process in parallel (default: 1)",
+        default=DEFAULT_SAMPLE_CONCURRENCY,
+        help=(
+            "Number of samples to process in parallel "
+            f"(default: {DEFAULT_SAMPLE_CONCURRENCY})"
+        ),
+    )
+    parser.add_argument(
+        "--run-concurrency",
+        type=int,
+        default=DEFAULT_RUN_CONCURRENCY,
+        help=(
+            "Number of runs per sample in parallel "
+            f"(default: {DEFAULT_RUN_CONCURRENCY})"
+        ),
     )
     args = parser.parse_args()
 
@@ -393,6 +446,7 @@ if __name__ == "__main__":
             output_dir=args.output_dir,
             resume=not args.no_resume,
             concurrency=args.concurrency,
+            run_concurrency=args.run_concurrency,
         )
     )
 
