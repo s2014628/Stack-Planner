@@ -8,6 +8,14 @@ End-to-end pipeline for generating experience data from QA benchmarks:
 4. Generate experience summaries (factual + SOP)
 5. Build final experience data (classified by experience type)
 
+Cross-dataset isolation:
+  Each dataset is processed as a **fully independent batch**.  In the default
+  sequential mode, shared state (global_statistics, LLM cache, search
+  semaphore) is reset before each dataset.  In ``--dataset-parallel`` mode,
+  shared state is reset once before launching all coroutines; the datasets
+  then share the search semaphore (for rate-limiting) but each has its own
+  isolated graph instances (memory_stack, agent state).
+
 Experience Types:
 - 事实性经验 (Factual Experience): TriviaQA, PopQA
   - Knowledge retrieval, search strategy, fact verification patterns
@@ -17,6 +25,11 @@ Experience Types:
 Usage:
     python -m scripts.qa_bench_pipeline.run_pipeline \\
         --datasets triviaqa popqa gpqa gsm8k math \\
+        --max-samples 50 --num-runs 5
+
+    # Run datasets in parallel (share search rate-limiter):
+    python -m scripts.qa_bench_pipeline.run_pipeline \\
+        --datasets triviaqa popqa --dataset-parallel \\
         --max-samples 50 --num-runs 5
 """
 
@@ -36,7 +49,10 @@ from scripts.qa_bench_pipeline.data_loader import (
     FACTUAL_DATASETS,
     SOP_DATASETS,
 )
-from scripts.qa_bench_pipeline.run_benchmark import run_benchmark_batch
+from scripts.qa_bench_pipeline.run_benchmark import (
+    run_benchmark_batch,
+    reset_global_state,
+)
 from scripts.qa_bench_pipeline.evaluator import evaluate_runs
 from scripts.qa_bench_pipeline.summary_agent import QABenchSummaryAgent
 
@@ -158,6 +174,173 @@ def print_statistics(experience_data: dict):
     print("=" * 60)
 
 
+# ─────────────────────────────────────────────────────────────
+#  Per-dataset pipeline: each dataset is a fully isolated batch
+# ─────────────────────────────────────────────────────────────
+
+
+async def _run_dataset_pipeline(
+    dataset_name: str,
+    args,
+    run_dir: str,
+    *,
+    reset_state: bool = True,
+) -> dict:
+    """Run the complete pipeline for a single dataset.
+
+    Args:
+        dataset_name: Name of the dataset to process.
+        args: Parsed CLI arguments.
+        run_dir: Root output directory for this pipeline run.
+        reset_state: If ``True`` (default), call ``reset_global_state()``
+            before processing.  Set to ``False`` when running in parallel
+            mode where the caller has already performed a single reset
+            before launching all coroutines.
+
+    Returns:
+        Dict with keys ``benchmark_results``, ``summaries``,
+        ``experience_data``, and ``dataset_dir``.
+    """
+    # 0. Isolate: reset shared state (only in sequential mode)
+    if reset_state:
+        reset_global_state()
+
+    dataset_dir = os.path.join(run_dir, dataset_name)
+    os.makedirs(dataset_dir, exist_ok=True)
+
+    sep = "-" * 60
+    print(f"\n{sep}")
+    print(f"  Dataset: {dataset_name}")
+    print(f"  Output:  {dataset_dir}")
+    print(f"{sep}")
+
+    # 1. Load data
+    samples = load_qa_samples(
+        datasets=[dataset_name],
+        split=args.split,
+        max_samples_per_dataset=args.max_samples,
+    )
+    print(f"  [{dataset_name}] Loaded {len(samples)} samples")
+    save_samples(samples, os.path.join(dataset_dir, "prepared_samples.json"))
+
+    # 2. Run benchmark
+    benchmark_results_file = os.path.join(dataset_dir, "benchmark_results.json")
+
+    if args.skip_benchmark and os.path.exists(benchmark_results_file):
+        print(
+            f"  [{dataset_name}] Loading existing benchmark results "
+            f"(--skip-benchmark)"
+        )
+        with open(benchmark_results_file, "r", encoding="utf-8") as f:
+            benchmark_results = json.load(f)
+    else:
+        print(
+            f"  [{dataset_name}] Running benchmark " f"({args.num_runs} runs per QA)..."
+        )
+        benchmark_results = await run_benchmark_batch(
+            samples,
+            num_runs=args.num_runs,
+            temperature=args.temperature,
+            output_dir=dataset_dir,
+            resume=not args.no_resume,
+            concurrency=args.concurrency,
+            run_concurrency=args.run_concurrency,
+            search_concurrency=args.search_concurrency,
+        )
+        with open(benchmark_results_file, "w", encoding="utf-8") as f:
+            json.dump(benchmark_results, f, ensure_ascii=False, indent=2)
+
+    print(
+        f"  [{dataset_name}] Benchmark complete: " f"{len(benchmark_results)} samples"
+    )
+
+    # 3. Evaluate
+    print(f"  [{dataset_name}] Evaluating results...")
+    for result in benchmark_results:
+        ground_truth = result["ground_truth"]
+        ds = result["dataset"]
+        ground_truth_aliases = result.get("ground_truth_aliases", [])
+        result["runs"] = evaluate_runs(
+            result["runs"], ground_truth, ds, ground_truth_aliases
+        )
+
+        success_count = sum(1 for r in result["runs"] if r.get("success", False))
+        total = len(result["runs"])
+        avg_score = sum(r.get("score", 0) for r in result["runs"]) / max(total, 1)
+        sid = result["sample_id"]
+        print(
+            f"    {sid}: " f"{success_count}/{total} success, avg_score={avg_score:.4f}"
+        )
+
+    evaluated_file = os.path.join(dataset_dir, "evaluated_results.json")
+    with open(evaluated_file, "w", encoding="utf-8") as f:
+        json.dump(benchmark_results, f, ensure_ascii=False, indent=2)
+
+    # 4. Summarise
+    summaries = []
+    if not args.skip_summary:
+        print(f"  [{dataset_name}] Generating experience summaries...")
+        summary_agent = QABenchSummaryAgent(
+            base_url=args.summary_base_url,
+            api_key=args.summary_api_key,
+            model=args.summary_model,
+        )
+        summaries = summary_agent.summarize_batch(
+            benchmark_results, concurrency=args.concurrency
+        )
+        summaries_file = os.path.join(dataset_dir, "summaries.json")
+        with open(summaries_file, "w", encoding="utf-8") as f:
+            json.dump(summaries, f, ensure_ascii=False, indent=2)
+    else:
+        summaries_file = os.path.join(dataset_dir, "summaries.json")
+        if os.path.exists(summaries_file):
+            with open(summaries_file, "r", encoding="utf-8") as f:
+                summaries = json.load(f)
+
+    # 5. Build experience data
+    experience_data = build_experience_data(benchmark_results, summaries)
+
+    # Save per-dataset experience data
+    exp_file = os.path.join(dataset_dir, "experience_data.json")
+    with open(exp_file, "w", encoding="utf-8") as f:
+        json.dump(experience_data, f, ensure_ascii=False, indent=2)
+    fact_file = os.path.join(dataset_dir, "factual_experiences.json")
+    with open(fact_file, "w", encoding="utf-8") as f:
+        json.dump(
+            experience_data["factual_experiences"],
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+    sop_file = os.path.join(dataset_dir, "sop_experiences.json")
+    with open(sop_file, "w", encoding="utf-8") as f:
+        json.dump(
+            experience_data["sop_experiences"],
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    print(f"  [{dataset_name}] Pipeline complete")
+
+    return {
+        "benchmark_results": benchmark_results,
+        "summaries": summaries,
+        "experience_data": experience_data,
+        "dataset_dir": dataset_dir,
+    }
+
+
+def _merge_experience_data(per_dataset_results: list) -> dict:
+    """Merge per-dataset experience_data dicts into a single combined dict."""
+    merged = {"factual_experiences": [], "sop_experiences": []}
+    for r in per_dataset_results:
+        ed = r["experience_data"]
+        merged["factual_experiences"].extend(ed.get("factual_experiences", []))
+        merged["sop_experiences"].extend(ed.get("sop_experiences", []))
+    return merged
+
+
 def main():
     parser = argparse.ArgumentParser(description="QA Bench Experience Data Pipeline")
     parser.add_argument(
@@ -212,6 +395,15 @@ def main():
         ),
     )
     parser.add_argument(
+        "--dataset-parallel",
+        action="store_true",
+        help=(
+            "Process datasets in parallel instead of sequentially. "
+            "When enabled, all datasets run concurrently but share the "
+            "global search rate-limiter to avoid API overload."
+        ),
+    )
+    parser.add_argument(
         "--skip-benchmark",
         action="store_true",
         help="Skip benchmark run, use existing results",
@@ -242,6 +434,9 @@ def main():
 
     selected_datasets = args.datasets or ALL_DATASETS
 
+    factual_selected = [d for d in selected_datasets if d in FACTUAL_DATASETS]
+    sop_selected = [d for d in selected_datasets if d in SOP_DATASETS]
+
     print("=" * 60)
     print("QA Bench Experience Data Pipeline")
     print("=" * 60)
@@ -254,126 +449,85 @@ def main():
     print(f"Sample concurrency: {args.concurrency}")
     print(f"Run concurrency: {args.run_concurrency}")
     print(f"Search concurrency: {args.search_concurrency}")
-
-    factual_selected = [d for d in selected_datasets if d in FACTUAL_DATASETS]
-    sop_selected = [d for d in selected_datasets if d in SOP_DATASETS]
+    print(f"Dataset parallel: {args.dataset_parallel}")
     print(f"Factual datasets: {factual_selected}")
     print(f"SOP datasets: {sop_selected}")
     print("=" * 60)
 
-    # ─── Step 1: Load data ────────────────────────────────────────────
-    print("\n[Step 1] Loading QA benchmark data...")
-    samples = load_qa_samples(
-        datasets=selected_datasets,
-        split=args.split,
-        max_samples_per_dataset=args.max_samples,
-    )
-    print(f"Loaded {len(samples)} total QA samples")
+    # ─── Per-dataset pipeline execution ───────────────────────────
+    if args.dataset_parallel:
+        # Parallel: all datasets run concurrently via asyncio.gather.
+        # Reset shared state once before launching all coroutines so
+        # we start clean, then let them share the semaphore / cache.
+        reset_global_state()
 
-    samples_file = os.path.join(run_dir, "prepared_samples.json")
-    save_samples(samples, samples_file)
+        async def _run_all_parallel():
+            tasks = [
+                _run_dataset_pipeline(ds, args, run_dir, reset_state=False)
+                for ds in selected_datasets
+            ]
+            return await asyncio.gather(*tasks, return_exceptions=True)
 
-    # ─── Step 2: Run benchmark ────────────────────────────────────────
-    benchmark_results_file = os.path.join(run_dir, "benchmark_results.json")
-
-    if args.skip_benchmark and os.path.exists(benchmark_results_file):
-        print("\n[Step 2] Loading existing benchmark results (--skip-benchmark)...")
-        with open(benchmark_results_file, "r", encoding="utf-8") as f:
-            benchmark_results = json.load(f)
+        raw_results = asyncio.run(_run_all_parallel())
+        per_dataset_results = []
+        for i, r in enumerate(raw_results):
+            if isinstance(r, Exception):
+                ds_name = selected_datasets[i]
+                print(f"\n  [ERROR] Dataset {ds_name} failed: {r}")
+            else:
+                per_dataset_results.append(r)
     else:
-        print(f"\n[Step 2] Running benchmark ({args.num_runs} runs per QA)...")
-        benchmark_results = asyncio.run(
-            run_benchmark_batch(
-                samples,
-                num_runs=args.num_runs,
-                temperature=args.temperature,
-                output_dir=run_dir,
-                resume=not args.no_resume,
-                concurrency=args.concurrency,
-                run_concurrency=args.run_concurrency,
-                search_concurrency=args.search_concurrency,
-            )
-        )
-        with open(benchmark_results_file, "w", encoding="utf-8") as f:
-            json.dump(benchmark_results, f, ensure_ascii=False, indent=2)
+        # Sequential (default): one dataset at a time, fully isolated.
+        per_dataset_results = []
+        for ds in selected_datasets:
+            try:
+                result = asyncio.run(_run_dataset_pipeline(ds, args, run_dir))
+                per_dataset_results.append(result)
+            except Exception as e:
+                print(f"\n  [ERROR] Dataset {ds} failed: {e}")
 
-    print(f"Benchmark complete: {len(benchmark_results)} QA samples processed")
+    if not per_dataset_results:
+        print("\nNo datasets completed successfully.")
+        return
 
-    # ─── Step 3: Evaluate results ─────────────────────────────────────
-    print("\n[Step 3] Evaluating results with per-dataset metrics...")
-    for result in benchmark_results:
-        ground_truth = result["ground_truth"]
-        dataset = result["dataset"]
-        ground_truth_aliases = result.get("ground_truth_aliases", [])
-        result["runs"] = evaluate_runs(
-            result["runs"], ground_truth, dataset, ground_truth_aliases
-        )
+    # ─── Merge results across datasets ────────────────────────────
+    print("\n[Merging] Combining results from all datasets...")
+    merged_experience = _merge_experience_data(per_dataset_results)
 
-        success_count = sum(1 for r in result["runs"] if r.get("success", False))
-        total = len(result["runs"])
-        avg_score = sum(r.get("score", 0) for r in result["runs"]) / max(total, 1)
-        print(
-            f"  {result['sample_id']} ({dataset}): "
-            f"{success_count}/{total} success, avg_score={avg_score:.4f}"
-        )
-
-    evaluated_file = os.path.join(run_dir, "evaluated_results.json")
-    with open(evaluated_file, "w", encoding="utf-8") as f:
-        json.dump(benchmark_results, f, ensure_ascii=False, indent=2)
-
-    # ─── Step 4: Generate summaries ───────────────────────────────────
-    summaries = []
-    if not args.skip_summary:
-        print("\n[Step 4] Generating experience summaries...")
-        print("  - Factual Experience summaries for TriviaQA/PopQA...")
-        print("  - SOP System Experience summaries for GPQA/GSM8K/MATH...")
-        summary_agent = QABenchSummaryAgent(
-            base_url=args.summary_base_url,
-            api_key=args.summary_api_key,
-            model=args.summary_model,
-        )
-        summaries = summary_agent.summarize_batch(
-            benchmark_results, concurrency=args.concurrency
-        )
-
-        summaries_file = os.path.join(run_dir, "summaries.json")
-        with open(summaries_file, "w", encoding="utf-8") as f:
-            json.dump(summaries, f, ensure_ascii=False, indent=2)
-    else:
-        print("\n[Step 4] Skipping summary generation (--skip-summary)")
-        summaries_file = os.path.join(run_dir, "summaries.json")
-        if os.path.exists(summaries_file):
-            with open(summaries_file, "r", encoding="utf-8") as f:
-                summaries = json.load(f)
-
-    # ─── Step 5: Build final experience data ──────────────────────────
-    print("\n[Step 5] Building final experience data...")
-    experience_data = build_experience_data(benchmark_results, summaries)
-
-    # Save combined experience data
+    # Save combined experience data at the top level
     output_file = os.path.join(run_dir, "experience_data.json")
     with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(experience_data, f, ensure_ascii=False, indent=2)
+        json.dump(merged_experience, f, ensure_ascii=False, indent=2)
 
-    # Save factual and SOP experiences separately for convenience
     factual_file = os.path.join(run_dir, "factual_experiences.json")
     with open(factual_file, "w", encoding="utf-8") as f:
         json.dump(
-            experience_data["factual_experiences"], f, ensure_ascii=False, indent=2
+            merged_experience["factual_experiences"],
+            f,
+            ensure_ascii=False,
+            indent=2,
         )
 
     sop_file = os.path.join(run_dir, "sop_experiences.json")
     with open(sop_file, "w", encoding="utf-8") as f:
-        json.dump(experience_data["sop_experiences"], f, ensure_ascii=False, indent=2)
+        json.dump(
+            merged_experience["sop_experiences"],
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
 
-    # ─── Print statistics ─────────────────────────────────────────────
-    print_statistics(experience_data)
+    # ─── Print statistics ─────────────────────────────────────────
+    print_statistics(merged_experience)
 
     print(f"\nPipeline Complete!")
     print(f"All experience data saved to: {run_dir}")
     print(f"  - Combined: {output_file}")
     print(f"  - Factual experiences: {factual_file}")
     print(f"  - SOP experiences: {sop_file}")
+    for r in per_dataset_results:
+        dd = r["dataset_dir"]
+        print(f"  - {dd}/")
     print("=" * 60)
 
 

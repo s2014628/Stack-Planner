@@ -51,6 +51,18 @@ class GlobalStatistics:
             "agent_times": self.get_agent_times(),
         }
 
+    def reset(self):
+        """
+        Reset all accumulated statistics.
+
+        Call this between independent dataset batches to avoid
+        cross-dataset contamination of timing / token data.
+        """
+        self.model_tokens = defaultdict(
+            lambda: {"input_tokens": 0, "output_tokens": 0, "request_cnt": 0}
+        )
+        self.agent_times = []
+
 
 global_statistics = GlobalStatistics()
 
