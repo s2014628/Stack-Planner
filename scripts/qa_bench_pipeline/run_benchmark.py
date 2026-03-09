@@ -65,6 +65,24 @@ def _clear_llm_cache():
     _llm_cache.clear()
 
 
+def reset_global_state():
+    """Reset all module-level shared mutable state.
+
+    Call this **before** processing each dataset batch to guarantee
+    complete isolation between datasets.  Resets:
+    - ``global_statistics``  (timing / token counters)
+    - ``_llm_cache``         (forces fresh LLM instances)
+    - ``_search_semaphore``  (will be lazily re-created)
+    """
+    global _search_semaphore
+
+    from src.utils.statistics import global_statistics
+
+    global_statistics.reset()
+    _clear_llm_cache()
+    _search_semaphore = None
+
+
 def _create_isolated_qa_bench_graph():
     """
     Create a fully isolated qa_bench graph with its own CentralAgent instance.
