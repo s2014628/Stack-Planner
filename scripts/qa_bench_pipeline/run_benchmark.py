@@ -164,15 +164,25 @@ async def _run_graph(
             "max_step_num": 5,
             "mcp_settings": {},
         },
-        "recursion_limit": 50,
+        "recursion_limit": 100,
     }
 
     final_state = None
-    async for s in graph.astream(
-        input=initial_state, config=config, stream_mode="values"
-    ):
-        if isinstance(s, dict):
-            final_state = s
+    graph_error = None
+    try:
+        async for s in graph.astream(
+            input=initial_state, config=config, stream_mode="values"
+        ):
+            if isinstance(s, dict):
+                final_state = s
+    except Exception as e:
+        # Catch GraphRecursionError and any other graph execution errors.
+        # Use whatever partial state was accumulated before the error.
+        graph_error = e
+        logger.warning(
+            f"Graph execution error ({type(e).__name__}): {e}. "
+            f"Using last captured state (exists={final_state is not None})."
+        )
 
     prediction = ""
     memory_stack_log = []
@@ -186,10 +196,13 @@ async def _run_graph(
             except json.JSONDecodeError:
                 memory_stack_log = []
 
-    return {
+    result = {
         "prediction": prediction,
         "memory_stack_log": memory_stack_log,
     }
+    if graph_error is not None:
+        result["graph_error"] = f"{type(graph_error).__name__}: {graph_error}"
+    return result
 
 
 async def run_single_qa(
@@ -217,12 +230,16 @@ async def run_single_qa(
     logger.info(f"Running sample={sample_id}, run={run_id}")
 
     start_time = time.time()
+    error_msg = None
     try:
         # Each run gets a fresh isolated graph (own CentralAgent + memory_stack)
         graph = _create_isolated_qa_bench_graph()
         result = await _run_graph(question, dataset, experience_type, graph)
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])
+        # Propagate graph-level errors (e.g. GraphRecursionError)
+        if "graph_error" in result:
+            error_msg = result["graph_error"]
     except Exception as e:
         logger.error(f"Run failed: sample={sample_id}, run={run_id}: {e}")
         import traceback
@@ -230,16 +247,20 @@ async def run_single_qa(
         logger.error(traceback.format_exc())
         prediction = ""
         memory_stack_log = []
+        error_msg = f"{type(e).__name__}: {e}"
 
     elapsed = time.time() - start_time
 
-    return {
+    run_result: Dict[str, Any] = {
         "run_id": run_id,
         "prediction": prediction,
         "memory_stack_log": memory_stack_log,
         "elapsed_seconds": round(elapsed, 2),
         "timestamp": datetime.now().isoformat(),
     }
+    if error_msg:
+        run_result["error"] = error_msg
+    return run_result
 
 
 async def run_benchmark_for_sample(
