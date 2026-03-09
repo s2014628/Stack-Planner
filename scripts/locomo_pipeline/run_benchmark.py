@@ -231,7 +231,7 @@ async def run_benchmark_for_sample(
     Returns:
         Sample result with all runs
     """
-    set_temperature(temperature)
+    # Temperature is set once at the batch level in run_benchmark_batch.
 
     run_sem = asyncio.Semaphore(run_concurrency)
 
@@ -388,7 +388,18 @@ async def run_benchmark_batch(
 
     # Launch all samples concurrently, bounded by sample_sem
     tasks = [_process_sample(idx, sample) for idx, sample in enumerate(pending_samples)]
-    await asyncio.gather(*tasks, return_exceptions=True)
+    gather_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Inspect gather results for any unhandled exceptions
+    for idx, res in enumerate(gather_results):
+        if isinstance(res, BaseException):
+            sample = pending_samples[idx]
+            key = f"{sample['sample_id']}_{sample['qa_index']}"
+            logger.error(f"Sample {key} raised unhandled exception: {res}")
+        elif res is None:
+            sample = pending_samples[idx]
+            key = f"{sample['sample_id']}_{sample['qa_index']}"
+            logger.warning(f"Sample {key} returned None (likely failed)")
 
     return all_results
 
