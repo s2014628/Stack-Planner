@@ -277,6 +277,35 @@ locomo_graph = build_locomo_graph()
 qa_bench_graph = build_qa_bench_graph()
 
 
+def build_qa_bench_reasoning_graph():
+    """
+    构建QA Bench纯推理专用的状态图。
+    仅使用CentralAgent进行推理，不启用Researcher/搜索Agent。
+    用于 GSM8K, MATH 等纯数学推理 benchmark。
+
+    Returns:
+        编译后的状态图对象
+    """
+    from langgraph.graph import StateGraph, START, END
+
+    builder = StateGraph(State)
+
+    builder.add_node("central_agent", central_agent_node)
+
+    # No sub-agents for reasoning-only mode (like locomo)
+    sub_agents = get_sub_agents_by_global_type("qa_bench_reasoning")
+    for sub_agent in sub_agents:
+        builder.add_node(sub_agent["name"], sub_agent["node"])
+
+    builder.add_edge(START, "central_agent")
+    builder.add_edge("central_agent", END)
+
+    return builder.compile()
+
+
+qa_bench_reasoning_graph = build_qa_bench_reasoning_graph()
+
+
 def build_graph_with_memory_from_builder(builder):
     """Build and return the agent workflow graph with memory."""
     # use persistent memory to save conversation history
@@ -297,6 +326,7 @@ _GRAPH_BUILDER_CLASS_MAP = {
     "sp_xxqg": sp_xxqg_graph_builder,
     "locomo": None,
     "qa_bench": None,
+    "qa_bench_reasoning": None,
 }
 
 _GRAPH_CLASS_MAP = {
@@ -306,6 +336,7 @@ _GRAPH_CLASS_MAP = {
     "sp_xxqg": {"memory": None, "no_memory": sp_xxqg_graph_builder.compile()},
     "locomo": {"memory": None, "no_memory": locomo_graph},
     "qa_bench": {"memory": None, "no_memory": qa_bench_graph},
+    "qa_bench_reasoning": {"memory": None, "no_memory": qa_bench_reasoning_graph},
 }
 
 

@@ -21,6 +21,10 @@ FACTUAL_DATASETS = ["triviaqa", "popqa"]
 SOP_DATASETS = ["gpqa", "gsm8k", "math"]
 ALL_DATASETS = FACTUAL_DATASETS + SOP_DATASETS
 
+# Datasets that should NOT use the researcher / search agent.
+# These are pure-reasoning tasks where web search adds no value.
+NO_SEARCH_DATASETS = ["gsm8k", "math"]
+
 # ─── Experience type classification ──────────────────────────────────
 EXPERIENCE_TYPE_MAP = {
     "triviaqa": "factual",
@@ -462,11 +466,10 @@ def build_user_query(sample: Dict[str, Any]) -> str:
             f"Provide your final answer as a single letter (A, B, C, or D)."
         )
     elif dataset in ("gsm8k", "math"):
-        # For GSM8K/MATH: math problem solving
+        # For GSM8K/MATH: pure math reasoning (no search)
         query = (
             f"Solve the following math problem step by step. "
-            f"You may search for relevant formulas or mathematical concepts if needed. "
-            f"Show your reasoning process.\n\n"
+            f"Show your reasoning process clearly.\n\n"
             f"Question: {question}\n\n"
             f"Provide the final numerical answer."
         )
