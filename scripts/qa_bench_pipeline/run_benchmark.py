@@ -41,9 +41,14 @@ _search_semaphore: Optional[asyncio.Semaphore] = None
 def _get_search_semaphore(
     max_concurrent: int = DEFAULT_SEARCH_CONCURRENCY,
 ) -> asyncio.Semaphore:
-    """Return (and lazily create) the global search semaphore."""
+    """Return (and lazily create) the global search semaphore.
+
+    Re-creates the semaphore if ``max_concurrent`` differs from the
+    current one so that callers who pass different values (e.g. via
+    ``--search-concurrency``) are always honoured.
+    """
     global _search_semaphore
-    if _search_semaphore is None:
+    if _search_semaphore is None or _search_semaphore._value != max_concurrent:
         _search_semaphore = asyncio.Semaphore(max_concurrent)
     return _search_semaphore
 
