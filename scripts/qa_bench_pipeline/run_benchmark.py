@@ -82,8 +82,34 @@ def _create_isolated_qa_bench_graph():
         return central_agent.execute_action(decision, state, config)
 
     async def isolated_researcher_node(state: State, config: RunnableConfig) -> Command:
-        """Researcher node bound to an isolated SubAgentManager instance."""
-        return await agent_manager.execute_researcher(state, config)
+        """Researcher node bound to an isolated SubAgentManager instance.
+
+        Wraps execute_researcher with error handling so that tool
+        initialization failures (e.g. missing TAVILY_API_KEY) don't crash
+        the entire graph.  Instead, returns an error message back to the
+        central agent so it can fall back to its own reasoning.
+        """
+        try:
+            return await agent_manager.execute_researcher(state, config)
+        except Exception as e:
+            from langchain_core.messages import HumanMessage
+
+            logger.error(f"Researcher node failed: {type(e).__name__}: {e}")
+            return Command(
+                update={
+                    "messages": [
+                        HumanMessage(
+                            content=(
+                                f"Research task failed: {type(e).__name__}: {e}. "
+                                "Please answer based on your own knowledge."
+                            ),
+                            name="researcher",
+                        )
+                    ],
+                    "current_node": "central_agent",
+                },
+                goto="central_agent",
+            )
 
     # --- Build the graph ---
     builder = StateGraph(State)
