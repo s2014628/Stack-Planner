@@ -36,6 +36,7 @@ DEFAULT_SEARCH_CONCURRENCY = 5
 # run concurrently across ALL graph executions.  This prevents hitting
 # search-API rate limits when sample_concurrency * run_concurrency is large.
 _search_semaphore: Optional[asyncio.Semaphore] = None
+_search_semaphore_size: Optional[int] = None
 
 
 def _get_search_semaphore(
@@ -44,12 +45,17 @@ def _get_search_semaphore(
     """Return (and lazily create) the global search semaphore.
 
     Re-creates the semaphore if ``max_concurrent`` differs from the
-    current one so that callers who pass different values (e.g. via
+    stored size so that callers who pass different values (e.g. via
     ``--search-concurrency``) are always honoured.
+
+    Uses a dedicated ``_search_semaphore_size`` variable rather than
+    inspecting ``Semaphore._value`` (which fluctuates as tasks
+    acquire / release the semaphore).
     """
-    global _search_semaphore
-    if _search_semaphore is None or _search_semaphore._value != max_concurrent:
+    global _search_semaphore, _search_semaphore_size
+    if _search_semaphore is None or _search_semaphore_size != max_concurrent:
         _search_semaphore = asyncio.Semaphore(max_concurrent)
+        _search_semaphore_size = max_concurrent
     return _search_semaphore
 
 
@@ -74,13 +80,14 @@ def reset_global_state():
     - ``_llm_cache``         (forces fresh LLM instances)
     - ``_search_semaphore``  (will be lazily re-created)
     """
-    global _search_semaphore
+    global _search_semaphore, _search_semaphore_size
 
     from src.utils.statistics import global_statistics
 
     global_statistics.reset()
     _clear_llm_cache()
     _search_semaphore = None
+    _search_semaphore_size = None
 
 
 def _create_isolated_qa_bench_graph():

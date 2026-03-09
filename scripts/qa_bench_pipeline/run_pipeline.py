@@ -9,10 +9,12 @@ End-to-end pipeline for generating experience data from QA benchmarks:
 5. Build final experience data (classified by experience type)
 
 Cross-dataset isolation:
-  Each dataset is processed as a **fully independent batch**.  Before each
-  batch the pipeline resets all module-level shared state (global_statistics,
-  LLM cache, search semaphore) so that datasets never interfere with each
-  other -- even when running in parallel with ``--dataset-parallel``.
+  Each dataset is processed as a **fully independent batch**.  In the default
+  sequential mode, shared state (global_statistics, LLM cache, search
+  semaphore) is reset before each dataset.  In ``--dataset-parallel`` mode,
+  shared state is reset once before launching all coroutines; the datasets
+  then share the search semaphore (for rate-limiting) but each has its own
+  isolated graph instances (memory_stack, agent state).
 
 Experience Types:
 - 事实性经验 (Factual Experience): TriviaQA, PopQA
@@ -181,19 +183,27 @@ async def _run_dataset_pipeline(
     dataset_name: str,
     args,
     run_dir: str,
+    *,
+    reset_state: bool = True,
 ) -> dict:
     """Run the complete pipeline for a single dataset.
 
-    This function is the **unit of isolation**: before doing any work it
-    resets all module-level shared state so that nothing leaks from a
-    previous (or concurrent) dataset batch.
+    Args:
+        dataset_name: Name of the dataset to process.
+        args: Parsed CLI arguments.
+        run_dir: Root output directory for this pipeline run.
+        reset_state: If ``True`` (default), call ``reset_global_state()``
+            before processing.  Set to ``False`` when running in parallel
+            mode where the caller has already performed a single reset
+            before launching all coroutines.
 
     Returns:
         Dict with keys ``benchmark_results``, ``summaries``,
         ``experience_data``, and ``dataset_dir``.
     """
-    # 0. Isolate: reset shared state
-    reset_global_state()
+    # 0. Isolate: reset shared state (only in sequential mode)
+    if reset_state:
+        reset_global_state()
 
     dataset_dir = os.path.join(run_dir, dataset_name)
     os.makedirs(dataset_dir, exist_ok=True)
@@ -447,12 +457,14 @@ def main():
     # ─── Per-dataset pipeline execution ───────────────────────────
     if args.dataset_parallel:
         # Parallel: all datasets run concurrently via asyncio.gather.
-        # They share the global search semaphore so API rate limits are
-        # respected, but each dataset resets its own statistics / caches.
+        # Reset shared state once before launching all coroutines so
+        # we start clean, then let them share the semaphore / cache.
+        reset_global_state()
 
         async def _run_all_parallel():
             tasks = [
-                _run_dataset_pipeline(ds, args, run_dir) for ds in selected_datasets
+                _run_dataset_pipeline(ds, args, run_dir, reset_state=False)
+                for ds in selected_datasets
             ]
             return await asyncio.gather(*tasks, return_exceptions=True)
 
