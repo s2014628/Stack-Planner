@@ -246,7 +246,7 @@ async def run_benchmark_for_sample(
     # Filter out exceptions and log them
     valid_runs: List[Dict[str, Any]] = []
     for i, run in enumerate(runs):
-        if isinstance(run, Exception):
+        if isinstance(run, BaseException):
             logger.error(
                 f"Run {i+1} for {sample['sample_id']} "
                 f"qa={sample['qa_index']} raised exception: {run}"
