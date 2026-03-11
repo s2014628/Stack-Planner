@@ -170,7 +170,17 @@ def main() -> None:
     parser.add_argument(
         "--skip-summary",
         action="store_true",
-        help="Skip summary generation, use existing summaries if available",
+        help="Skip summary generation. Use with --summaries-file to load existing summaries.",
+    )
+    parser.add_argument(
+        "--summaries-file",
+        type=str,
+        default=None,
+        help=(
+            "Path to an existing summaries.json file to load when using "
+            "--skip-summary. If not provided with --skip-summary, "
+            "experience_summary fields will be empty."
+        ),
     )
     parser.add_argument(
         "--summary-base-url",
@@ -263,10 +273,17 @@ def main() -> None:
         )
     else:
         print("\n[Step 3] Skipping summary generation (--skip-summary)")
-        if os.path.exists(summaries_file):
-            with open(summaries_file, "r", encoding="utf-8") as f:
+        # Load from explicit --summaries-file if provided
+        load_path = args.summaries_file
+        if load_path and os.path.exists(load_path):
+            with open(load_path, "r", encoding="utf-8") as f:
                 summaries = json.load(f)
-            print(f"  Loaded existing summaries: {len(summaries)} entries")
+            print(f"  Loaded existing summaries from: {load_path}")
+            print(f"  {len(summaries)} entries")
+        elif load_path:
+            print(f"  Warning: summaries file not found: {load_path}")
+        else:
+            print("  No --summaries-file provided; experience_summary will be empty.")
 
     # ─── Step 4: Build final experience data ─────────────────────
     print("\n[Step 4] Building final experience data...")

@@ -118,7 +118,12 @@ class SkillNetSummaryAgent:
                 temperature=0.3,
                 max_tokens=2000,
             )
-            summary = response.choices[0].message.content.strip()
+            content = response.choices[0].message.content
+            summary = (
+                content.strip()
+                if content
+                else "Summary generation failed: empty response"
+            )
         except Exception as e:
             summary = f"Summary generation failed: {e}"
 
