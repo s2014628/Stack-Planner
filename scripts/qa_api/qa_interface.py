@@ -32,7 +32,7 @@ import os
 import sys
 import time
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -354,9 +354,23 @@ def main():
             print(f"\nTrajectory ({len(result['trajectory'])} steps):")
             for i, step in enumerate(result["trajectory"]):
                 action = step.get("action", "unknown")
-                reasoning = step.get("reasoning", "")
-                preview = reasoning[:120] + "..." if len(reasoning) > 120 else reasoning
-                print(f"  [{i+1}] {action}: {preview}")
+                agent_type = step.get("agent_type", "")
+                content = step.get("content", "")
+                # content can be a string or a dict (e.g. message objects)
+                if isinstance(content, dict):
+                    content = content.get("content", str(content))
+                elif not isinstance(content, str):
+                    content = str(content)
+                preview = content[:150] + "..." if len(content) > 150 else content
+                agent_label = f"({agent_type})" if agent_type else ""
+                print(f"  [{i+1}] {action}{agent_label}: {preview}")
+                # Show result summary if present
+                result_data = step.get("result")
+                if result_data and isinstance(result_data, dict):
+                    res_content = result_data.get("content", "")
+                    if isinstance(res_content, str) and res_content:
+                        res_preview = res_content[:120] + "..." if len(res_content) > 120 else res_content
+                        print(f"       -> result: {res_preview}")
 
 
 if __name__ == "__main__":
