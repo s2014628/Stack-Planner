@@ -34,6 +34,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from scripts.qa_bench_pipeline.evaluator import evaluate_runs
 from scripts.qa_bench_pipeline.run_pipeline import (
     build_experience_data,
+    build_experience_data_per_run,
     print_statistics,
     _merge_experience_data,
 )
@@ -86,6 +87,7 @@ def process_dataset(
     dataset_dir: str,
     *,
     skip_summary: bool = False,
+    per_run: bool = False,
     summary_base_url: str = "",
     summary_api_key: str = "",
     summary_model: str = "",
@@ -190,10 +192,25 @@ def process_dataset(
         )
     print(f"    Saved experience_data.json, factual_experiences.json, sop_experiences.json")
 
+    # Build per-run flat experience data
+    per_run_experiences = []
+    if per_run:
+        per_run_experiences = build_experience_data_per_run(
+            benchmark_results, summaries or None
+        )
+        per_run_file = os.path.join(dataset_dir, "per_run_experiences.json")
+        with open(per_run_file, "w", encoding="utf-8") as f:
+            json.dump(per_run_experiences, f, ensure_ascii=False, indent=2)
+        print(
+            f"    Saved per_run_experiences.json "
+            f"({len(per_run_experiences)} run-level entries)"
+        )
+
     return {
         "benchmark_results": benchmark_results,
         "summaries": summaries,
         "experience_data": experience_data,
+        "per_run_experiences": per_run_experiences,
         "dataset_dir": dataset_dir,
     }
 
@@ -236,6 +253,15 @@ def main():
         type=int,
         default=3,
         help="Summary generation concurrency (default: 3)",
+    )
+    parser.add_argument(
+        "--per-run",
+        action="store_true",
+        help=(
+            "Also generate per-run flat experience data where each run is "
+            "an independent entry (saves per_run_experiences.json). "
+            "This is useful for RQ-KMeans codebook training."
+        ),
     )
     args = parser.parse_args()
 
@@ -286,6 +312,7 @@ def main():
                 dataset_name,
                 dataset_dir,
                 skip_summary=args.skip_summary,
+                per_run=args.per_run,
                 summary_base_url=args.summary_base_url,
                 summary_api_key=args.summary_api_key,
                 summary_model=args.summary_model,
@@ -317,6 +344,17 @@ def main():
         json.dump(merged["sop_experiences"], f, ensure_ascii=False, indent=2)
 
     print_statistics(merged)
+
+    # Merge and save run-level per-run experience data
+    if args.per_run:
+        all_per_run = []
+        for r in per_dataset_results:
+            all_per_run.extend(r.get("per_run_experiences", []))
+        per_run_file = os.path.join(run_dir, "per_run_experiences.json")
+        with open(per_run_file, "w", encoding="utf-8") as f:
+            json.dump(all_per_run, f, ensure_ascii=False, indent=2)
+        print(f"\nPer-run experience data: {len(all_per_run)} entries")
+        print(f"  - {per_run_file}")
 
     print(f"\nDone. Experience data saved to: {run_dir}")
     print(f"  - {output_file}")

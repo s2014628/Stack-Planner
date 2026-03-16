@@ -36,6 +36,7 @@ Usage:
 import asyncio
 import json
 import os
+import re
 import sys
 import argparse
 from datetime import datetime
@@ -127,6 +128,103 @@ def build_experience_data(
         "factual_experiences": factual_experiences,
         "sop_experiences": sop_experiences,
     }
+
+
+def _extract_run_reasoning(memory_stack_log: list) -> str:
+    """Extract reasoning text from a single run's memory_stack_log.
+
+    Parses each entry's content (JSON or plain text) and collects
+    reasoning fields into a single joined string.
+    """
+    parts = []
+    for entry in memory_stack_log:
+        content = entry.get("content", "")
+        if not content:
+            continue
+        raw = content.strip()
+        raw = re.sub(r"^```json\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+        try:
+            obj = json.loads(raw)
+            reasoning = obj.get("reasoning", "")
+            if reasoning:
+                parts.append(reasoning.strip())
+        except (json.JSONDecodeError, AttributeError):
+            parts.append(raw[:500])
+    return " ".join(parts)
+
+
+def build_experience_data_per_run(
+    evaluated_results: list,
+    summaries: list | None = None,
+) -> list:
+    """Build flat experience data where each run is an independent entry.
+
+    Instead of grouping runs under their parent sample, this function
+    produces one experience entry per run.  This increases the number of
+    data points (N samples * M runs) and gives each entry a unique
+    reasoning chain, making it better suited for embedding / codebook
+    training.
+
+    Args:
+        evaluated_results: List of evaluated benchmark results (each
+            contains ``runs`` with ``memory_stack_log``).
+        summaries: Optional list of per-sample summaries.  When provided
+            the sample-level summary is copied into every child run entry
+            for reference.
+
+    Returns:
+        Flat list of experience dicts, each with:
+        - sample_id: ``{orig_sample_id}_run_{run_id}``
+        - original_sample_id: the parent sample id
+        - run_id, dataset, experience_type, question, ground_truth
+        - reasoning: extracted reasoning chain for *this* run only
+        - prediction, score, success
+        - memory_stack_log: the raw log for this run
+        - experience_summary: per-sample summary (if available)
+    """
+    summary_map = {}
+    if summaries:
+        for s in summaries:
+            summary_map[s["sample_id"]] = s
+
+    per_run_entries: list = []
+
+    for result in evaluated_results:
+        sample_id = result["sample_id"]
+        dataset = result["dataset"]
+        experience_type = result.get("experience_type", "factual")
+        question = result["question"]
+        ground_truth = result["ground_truth"]
+        ground_truth_aliases = result.get("ground_truth_aliases", [])
+        summary_info = summary_map.get(sample_id, {})
+
+        for run in result.get("runs", []):
+            run_id = run["run_id"]
+            stack_log = run.get("memory_stack_log", [])
+            reasoning = _extract_run_reasoning(stack_log)
+
+            entry = {
+                "sample_id": f"{sample_id}_run_{run_id}",
+                "original_sample_id": sample_id,
+                "run_id": run_id,
+                "dataset": dataset,
+                "experience_type": experience_type,
+                "question": question,
+                "ground_truth": ground_truth,
+                "ground_truth_aliases": ground_truth_aliases,
+                "reasoning": reasoning,
+                "prediction": run.get("prediction", ""),
+                "score": run.get("score", 0.0),
+                "success": run.get("success", False),
+                "memory_stack_log": stack_log,
+                "elapsed_seconds": run.get("elapsed_seconds", 0),
+                "experience_summary": summary_info.get("summary", ""),
+                "metadata": result.get("metadata", {}),
+            }
+            per_run_entries.append(entry)
+
+    return per_run_entries
 
 
 def print_statistics(experience_data: dict):
