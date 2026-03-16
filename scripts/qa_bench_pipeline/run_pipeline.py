@@ -57,8 +57,10 @@ from scripts.qa_bench_pipeline.run_benchmark import (
 from scripts.qa_bench_pipeline.evaluator import evaluate_runs
 from scripts.qa_bench_pipeline.summary_agent import QABenchSummaryAgent
 
-DEFAULT_SUMMARY_BASE_URL = "http://123.57.228.132:8285/api"
-DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
+# DEFAULT_SUMMARY_BASE_URL = "http://123.57.228.132:8286/api"
+# DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
+DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
 
 
 def build_experience_data(
@@ -420,7 +422,7 @@ def main():
     parser.add_argument(
         "--summary-api-key",
         type=str,
-        default=os.getenv("SUMMARY_API_KEY", "sk-7374e2abda1141ffa4fe8eb01ae582f7"),
+        default=os.getenv("SUMMARY_API_KEY", "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"),
     )
     parser.add_argument(
         "--summary-model",

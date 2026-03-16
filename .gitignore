@@ -65,3 +65,5 @@ graceful-mapping-gizmo.md
 docs/
 examples/
 results/locomo/
+nohup.out
+results/

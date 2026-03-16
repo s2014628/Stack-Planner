@@ -123,6 +123,7 @@ def _create_isolated_qa_bench_graph():
 
     # Create isolated agent instances (each has its own memory_stack)
     central_agent = CentralAgent(graph_format="qa_bench")
+    central_agent.MAX_DECISION_ITERATIONS = 6
     agent_manager = SubAgentManager(central_agent)
 
     # --- Closure-based node functions that reference isolated instances ---
@@ -304,10 +305,10 @@ async def _run_graph(
             "thread_id": f"qa_bench_{dataset}_{datetime.now().timestamp()}",
             "graph_format": "qa_bench_reasoning" if not use_search else "qa_bench",
             "max_plan_iterations": 1,
-            "max_step_num": 5,
+            "max_step_num": 3,
             "mcp_settings": {},
         },
-        "recursion_limit": 100,
+        "recursion_limit": 40,
     }
 
     final_state = None
