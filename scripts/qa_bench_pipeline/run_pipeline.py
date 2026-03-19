@@ -157,6 +157,7 @@ def _extract_run_reasoning(memory_stack_log: list) -> str:
 def build_experience_data_per_run(
     evaluated_results: list,
     summaries: list | None = None,
+    per_run_summaries: dict | None = None,
 ) -> list:
     """Build flat experience data where each run is an independent entry.
 
@@ -170,8 +171,12 @@ def build_experience_data_per_run(
         evaluated_results: List of evaluated benchmark results (each
             contains ``runs`` with ``memory_stack_log``).
         summaries: Optional list of per-sample summaries.  When provided
-            the sample-level summary is copied into every child run entry
-            for reference.
+            and ``per_run_summaries`` is not available, the sample-level
+            summary is used as fallback.
+        per_run_summaries: Optional dict mapping
+            ``"{sample_id}_run_{run_id}"`` to a run-specific summary
+            string.  When provided, each run entry gets its own
+            dedicated summary instead of sharing the sample-level one.
 
     Returns:
         Flat list of experience dicts, each with:
@@ -181,7 +186,8 @@ def build_experience_data_per_run(
         - reasoning: extracted reasoning chain for *this* run only
         - prediction, score, success
         - memory_stack_log: the raw log for this run
-        - experience_summary: per-sample summary (if available)
+        - experience_summary: per-run summary (preferred) or per-sample
+          summary (fallback)
     """
     summary_map = {}
     if summaries:
@@ -197,15 +203,22 @@ def build_experience_data_per_run(
         question = result["question"]
         ground_truth = result["ground_truth"]
         ground_truth_aliases = result.get("ground_truth_aliases", [])
-        summary_info = summary_map.get(sample_id, {})
+        sample_summary = summary_map.get(sample_id, {}).get("summary", "")
 
         for run in result.get("runs", []):
             run_id = run["run_id"]
+            run_key = f"{sample_id}_run_{run_id}"
             stack_log = run.get("memory_stack_log", [])
             reasoning = _extract_run_reasoning(stack_log)
 
+            # Prefer per-run summary; fall back to sample-level summary
+            if per_run_summaries and run_key in per_run_summaries:
+                run_summary = per_run_summaries[run_key]
+            else:
+                run_summary = sample_summary
+
             entry = {
-                "sample_id": f"{sample_id}_run_{run_id}",
+                "sample_id": run_key,
                 "original_sample_id": sample_id,
                 "run_id": run_id,
                 "dataset": dataset,
@@ -219,7 +232,7 @@ def build_experience_data_per_run(
                 "success": run.get("success", False),
                 "memory_stack_log": stack_log,
                 "elapsed_seconds": run.get("elapsed_seconds", 0),
-                "experience_summary": summary_info.get("summary", ""),
+                "experience_summary": run_summary,
                 "metadata": result.get("metadata", {}),
             }
             per_run_entries.append(entry)
