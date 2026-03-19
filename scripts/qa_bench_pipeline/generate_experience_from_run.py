@@ -88,6 +88,7 @@ def process_dataset(
     *,
     skip_summary: bool = False,
     per_run: bool = False,
+    per_run_summary: bool = False,
     summary_base_url: str = "",
     summary_api_key: str = "",
     summary_model: str = "",
@@ -194,9 +195,41 @@ def process_dataset(
 
     # Build per-run flat experience data
     per_run_experiences = []
+    run_summaries_map = None
     if per_run:
+        # Generate per-run summaries if requested
+        if per_run_summary and not skip_summary:
+            print(f"    Generating per-run summaries...")
+            summary_agent = QABenchSummaryAgent(
+                base_url=summary_base_url,
+                api_key=summary_api_key,
+                model=summary_model,
+            )
+            run_summaries_map = summary_agent.summarize_all_runs(
+                benchmark_results, concurrency=concurrency
+            )
+            run_summaries_file = os.path.join(dataset_dir, "per_run_summaries.json")
+            with open(run_summaries_file, "w", encoding="utf-8") as f:
+                json.dump(run_summaries_map, f, ensure_ascii=False, indent=2)
+            print(
+                f"    Saved per_run_summaries.json "
+                f"({len(run_summaries_map)} run-level summaries)"
+            )
+        elif per_run_summary and skip_summary:
+            # Try to load existing per-run summaries
+            run_summaries_file = os.path.join(dataset_dir, "per_run_summaries.json")
+            if os.path.exists(run_summaries_file):
+                with open(run_summaries_file, "r", encoding="utf-8") as f:
+                    run_summaries_map = json.load(f)
+                print(
+                    f"    Loaded existing {run_summaries_file} "
+                    f"({len(run_summaries_map)} entries, --skip-summary)"
+                )
+
         per_run_experiences = build_experience_data_per_run(
-            benchmark_results, summaries or None
+            benchmark_results,
+            summaries or None,
+            per_run_summaries=run_summaries_map,
         )
         per_run_file = os.path.join(dataset_dir, "per_run_experiences.json")
         with open(per_run_file, "w", encoding="utf-8") as f:
@@ -263,6 +296,15 @@ def main():
             "This is useful for RQ-KMeans codebook training."
         ),
     )
+    parser.add_argument(
+        "--per-run-summary",
+        action="store_true",
+        help=(
+            "Generate a dedicated summary for each individual run "
+            "(instead of sharing the sample-level summary). "
+            "Implies --per-run. Saves per_run_summaries.json."
+        ),
+    )
     args = parser.parse_args()
 
     run_dir = os.path.abspath(args.run_dir)
@@ -305,6 +347,10 @@ def main():
     print(f"Skip summary: {args.skip_summary}")
     print("=" * 60)
 
+    # --per-run-summary implies --per-run
+    if args.per_run_summary:
+        args.per_run = True
+
     per_dataset_results = []
     for dataset_name, dataset_dir in dataset_dirs:
         try:
@@ -313,6 +359,7 @@ def main():
                 dataset_dir,
                 skip_summary=args.skip_summary,
                 per_run=args.per_run,
+                per_run_summary=args.per_run_summary,
                 summary_base_url=args.summary_base_url,
                 summary_api_key=args.summary_api_key,
                 summary_model=args.summary_model,
