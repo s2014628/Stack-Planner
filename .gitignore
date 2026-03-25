@@ -67,3 +67,10 @@ examples/
 results/locomo/
 nohup.out
 results/
+results/
+data/
+logs/
+*.log
+log*.txt
+nohup.out
+reports/

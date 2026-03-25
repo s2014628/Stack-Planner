@@ -246,16 +246,15 @@ def generate_experience_summary(
     """
     from openai import OpenAI
 
-    # Align with qa_bench_pipeline/summary_agent.py OpenRouter defaults
-    base_url = summary_base_url or os.getenv(
-        "SUMMARY_BASE_URL", "https://openrouter.ai/api/v1"
+    from scripts.qa_bench_pipeline.summary_agent import (
+        SUMMARY_API_KEY as _SA_KEY,
+        SUMMARY_BASE_URL as _SA_URL,
+        SUMMARY_MODEL as _SA_MODEL,
     )
-    api_key = summary_api_key or os.getenv(
-        "SUMMARY_API_KEY", "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"
-    )
-    model = summary_model or os.getenv(
-        "SUMMARY_MODEL", "deepseek/deepseek-v3.2"
-    )
+
+    base_url = summary_base_url or _SA_URL
+    api_key = summary_api_key or _SA_KEY
+    model = summary_model or _SA_MODEL
     client = OpenAI(base_url=base_url, api_key=api_key)
 
     memory_stack_text = _format_memory_stack_for_summary(memory_stack_log)

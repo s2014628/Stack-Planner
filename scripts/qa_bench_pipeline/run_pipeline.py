@@ -56,12 +56,12 @@ from scripts.qa_bench_pipeline.run_benchmark import (
     reset_global_state,
 )
 from scripts.qa_bench_pipeline.evaluator import evaluate_runs
-from scripts.qa_bench_pipeline.summary_agent import QABenchSummaryAgent
-
-# DEFAULT_SUMMARY_BASE_URL = "http://123.57.228.132:8286/api"
-# DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
-DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
+from scripts.qa_bench_pipeline.summary_agent import (
+    QABenchSummaryAgent,
+    SUMMARY_API_KEY,
+    SUMMARY_BASE_URL,
+    SUMMARY_MODEL,
+)
 
 
 def build_experience_data(
@@ -528,17 +528,20 @@ def main():
     parser.add_argument(
         "--summary-base-url",
         type=str,
-        default=os.getenv("SUMMARY_BASE_URL", DEFAULT_SUMMARY_BASE_URL),
+        default=SUMMARY_BASE_URL,
+        help="OpenRouter-compatible API base URL (default: same as summary_agent.py)",
     )
     parser.add_argument(
         "--summary-api-key",
         type=str,
-        default=os.getenv("SUMMARY_API_KEY", "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"),
+        default=SUMMARY_API_KEY,
+        help="API key (default: SUMMARY_API_KEY env or summary_agent.py fallback)",
     )
     parser.add_argument(
         "--summary-model",
         type=str,
-        default=os.getenv("SUMMARY_MODEL", DEFAULT_SUMMARY_MODEL),
+        default=SUMMARY_MODEL,
+        help="Model id on the summary provider (default: same as summary_agent.py)",
     )
     args = parser.parse_args()
 

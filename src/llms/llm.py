@@ -35,6 +35,31 @@ def _get_llm_type_config_keys() -> dict[str, str]:
     }
 
 
+def _inject_api_key_fallback_from_summary_agent(merged_conf: Dict[str, Any]) -> None:
+    """
+    When YAML/env left ``api_key`` empty, reuse the same OpenRouter key as the
+    QA bench summary agent (``SUMMARY_API_KEY`` or ``summary_agent`` default).
+
+    This keeps CentralAgent / sub-agents aligned with ``summary_agent.py`` so
+    you only maintain one default key in the repo.
+    """
+    raw = merged_conf.get("api_key")
+    if raw is not None and str(raw).strip():
+        return
+    sk = os.getenv("SUMMARY_API_KEY", "").strip()
+    if not sk:
+        try:
+            from scripts.qa_bench_pipeline.summary_agent import (
+                SUMMARY_API_KEY as _summary_default_key,
+            )
+
+            sk = (_summary_default_key or "").strip()
+        except Exception:
+            sk = ""
+    if sk:
+        merged_conf["api_key"] = sk
+
+
 def _get_env_llm_conf(llm_type: str) -> Dict[str, Any]:
     """
     Get LLM configuration from environment variables.
@@ -67,6 +92,8 @@ def _create_llm_use_conf(llm_type: LLMType, conf: Dict[str, Any]) -> BaseChatMod
 
     # Merge configurations, with environment variables taking precedence
     merged_conf = {**llm_conf, **env_conf}
+
+    _inject_api_key_fallback_from_summary_agent(merged_conf)
 
     if not merged_conf:
         raise ValueError(f"No configuration found for LLM type: {llm_type}")

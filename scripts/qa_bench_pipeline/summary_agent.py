@@ -21,7 +21,7 @@ from openai import OpenAI
 # SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "sk-7374e2abda1141ffa4fe8eb01ae582f7")
 # SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", "deepseek-v3.2-20251201-160k-local")
 SUMMARY_BASE_URL = os.getenv("SUMMARY_BASE_URL", "https://openrouter.ai/api/v1")
-SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "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")
+SUMMARY_API_KEY = os.getenv("SUMMARY_API_KEY", "")
 SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", "deepseek/deepseek-v3.2")
 
 
