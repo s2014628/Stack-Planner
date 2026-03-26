@@ -216,7 +216,7 @@ def build_experience_data_per_run(
             # per_run_summaries values are dicts with "summary" and
             # "problem_type" keys; sample_summary is a plain string.
             run_summary = sample_summary
-            run_problem_type = ""
+            run_problem_type = summary_map.get(sample_id, {}).get("problem_type", "")
             if per_run_summaries and run_key in per_run_summaries:
                 per_run_info = per_run_summaries[run_key]
                 if isinstance(per_run_info, dict):
