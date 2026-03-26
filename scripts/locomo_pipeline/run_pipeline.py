@@ -76,10 +76,12 @@ def build_experience_data(
             "common_mistakes": experience_info.get("common_mistakes", ""),
             "experience_note": experience_info.get("experience_note", ""),
             # Run statistics
-            "success_count": summary_info.get("success_count", 0)
-            or experience_info.get("success_count", 0),
-            "failure_count": summary_info.get("failure_count", 0)
-            or experience_info.get("failure_count", 0),
+            "success_count": summary_info.get(
+                "success_count", experience_info.get("success_count", 0)
+            ),
+            "failure_count": summary_info.get(
+                "failure_count", experience_info.get("failure_count", 0)
+            ),
             "success_summary": summary_info.get("summary", ""),
             "runs": [],
             # Keep full history for reference (can be dropped to save space)
