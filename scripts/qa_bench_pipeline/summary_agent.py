@@ -13,7 +13,8 @@ Generate experience summaries from benchmark runs, categorized into:
 """
 
 import os
-from typing import Any, Dict, List
+import re
+from typing import Any, Dict, List, Tuple
 
 from openai import OpenAI
 
@@ -32,12 +33,14 @@ FACTUAL_SYSTEM_PROMPT = """You are an expert at analyzing multi-agent system exe
 Your task is to analyze successful and failed runs to extract **factual experience patterns (事实性经验)**.
 
 Factual experience focuses on:
-1. **Search Strategy Patterns**: How the agent formulates search queries, what keywords it uses
-2. **Knowledge Retrieval Patterns**: How effectively the agent retrieves and filters relevant information
-3. **Fact Verification Patterns**: How the agent verifies retrieved facts against the question
-4. **Answer Extraction Patterns**: How the agent extracts concise answers from retrieved content
+1. **Problem Type Classification (问题类型)**: Identify the specific type of problem this experience addresses. Use a concise label such as "实体属性查询" (entity attribute lookup), "多跳事实检索" (multi-hop fact retrieval), "时间/日期查询" (temporal query), "人物关系查询" (person relationship query), "数值/统计查询" (numerical/statistical query), etc. This classification will be used for clustering similar experiences.
+2. **Search Strategy Patterns**: How the agent formulates search queries, what keywords it uses
+3. **Knowledge Retrieval Patterns**: How effectively the agent retrieves and filters relevant information
+4. **Fact Verification Patterns**: How the agent verifies retrieved facts against the question
+5. **Answer Extraction Patterns**: How the agent extracts concise answers from retrieved content
 
 Provide your analysis in a structured format:
+- **问题类型 (Problem Type)**: A concise problem type label for this experience
 - **Successful Search Patterns**: What search strategies worked well
 - **Failed Search Patterns**: What search approaches led to failure
 - **Knowledge Gap Indicators**: When the agent correctly identified vs. missed knowledge gaps
@@ -61,6 +64,11 @@ Please extract factual experience patterns. Focus on:
 2. What information retrieval patterns were effective vs. ineffective?
 3. What reusable factual knowledge patterns can be derived?
 
+IMPORTANT: You MUST start your response with a problem type classification line in exactly the following format:
+**问题类型 (Problem Type):** <concise problem type label>
+
+For example: **问题类型 (Problem Type):** 实体属性查询
+
 Keep your analysis concise and actionable.
 """
 
@@ -72,10 +80,11 @@ PER_RUN_FACTUAL_SYSTEM_PROMPT = """You are an expert at analyzing a single execu
 Your task is to analyze ONE specific run and extract **factual experience (事实性经验)** for this run only.
 
 Focus on:
-1. **Search Strategy**: How the agent formulated search queries in this run
-2. **Knowledge Retrieval**: How effectively information was retrieved and filtered
-3. **Fact Verification**: How the agent verified retrieved facts
-4. **Answer Extraction**: How the agent arrived at the final answer
+1. **Problem Type Classification (问题类型)**: Identify the specific type of problem this experience addresses. Use a concise label such as "实体属性查询" (entity attribute lookup), "多跳事实检索" (multi-hop fact retrieval), "时间/日期查询" (temporal query), "人物关系查询" (person relationship query), "数值/统计查询" (numerical/statistical query), etc.
+2. **Search Strategy**: How the agent formulated search queries in this run
+3. **Knowledge Retrieval**: How effectively information was retrieved and filtered
+4. **Fact Verification**: How the agent verified retrieved facts
+5. **Answer Extraction**: How the agent arrived at the final answer
 
 Provide a concise summary of this single run's experience. Do NOT compare with other runs."""
 
@@ -95,6 +104,11 @@ Please summarize the experience from this single run:
 2. Why did it succeed or fail?
 3. What reusable experience can be extracted from this specific run?
 
+IMPORTANT: You MUST start your response with a problem type classification line in exactly the following format:
+**问题类型 (Problem Type):** <concise problem type label>
+
+For example: **问题类型 (Problem Type):** 实体属性查询
+
 Keep your summary concise (200-500 words)."""
 
 
@@ -105,10 +119,11 @@ PER_RUN_SOP_SYSTEM_PROMPT = """You are an expert at analyzing a single execution
 Your task is to analyze ONE specific run and extract **SOP system-level experience (SOP系统层经验)** for this run only.
 
 Focus on:
-1. **Reasoning Steps**: The step-by-step reasoning workflow used in this run
-2. **Tool Usage**: How and when tools (search/research) were used
-3. **Error Handling**: Whether errors were detected and how they were handled
-4. **Decision Points**: Key decisions made during the solving process
+1. **Problem Type Classification (问题类型)**: Identify the specific type of problem this experience addresses. Use a concise label such as "数学代数运算" (algebraic computation), "多步算术推理" (multi-step arithmetic reasoning), "科学概念推理" (scientific concept reasoning), "逻辑推理" (logical reasoning), "公式推导与应用" (formula derivation and application), etc.
+2. **Reasoning Steps**: The step-by-step reasoning workflow used in this run
+3. **Tool Usage**: How and when tools (search/research) were used
+4. **Error Handling**: Whether errors were detected and how they were handled
+5. **Decision Points**: Key decisions made during the solving process
 
 Provide a concise summary of this single run's experience. Do NOT compare with other runs."""
 
@@ -128,6 +143,11 @@ Please summarize the experience from this single run:
 2. Why did it succeed or fail?
 3. What reusable SOP experience can be extracted from this specific run?
 
+IMPORTANT: You MUST start your response with a problem type classification line in exactly the following format:
+**问题类型 (Problem Type):** <concise problem type label>
+
+For example: **问题类型 (Problem Type):** 多步算术推理
+
 Keep your summary concise (200-500 words)."""
 
 
@@ -138,12 +158,14 @@ SOP_SYSTEM_PROMPT = """You are an expert at analyzing multi-agent system executi
 Your task is to analyze successful and failed runs to extract **SOP system-level experience (SOP系统层经验)**.
 
 SOP system experience focuses on:
-1. **Reasoning Workflow Patterns**: Step-by-step reasoning strategies that work for different problem types
-2. **Tool Usage SOPs**: When and how to use search/research tools during reasoning
-3. **Error Detection & Recovery**: How the agent identifies errors and self-corrects
-4. **Decision Tree Patterns**: Key decision points in the solving process
+1. **Problem Type Classification (问题类型)**: Identify the specific type of problem this experience addresses. Use a concise label such as "数学代数运算" (algebraic computation), "多步算术推理" (multi-step arithmetic reasoning), "科学概念推理" (scientific concept reasoning), "逻辑推理" (logical reasoning), "公式推导与应用" (formula derivation and application), etc. This classification will be used for clustering similar experiences.
+2. **Reasoning Workflow Patterns**: Step-by-step reasoning strategies that work for different problem types
+3. **Tool Usage SOPs**: When and how to use search/research tools during reasoning
+4. **Error Detection & Recovery**: How the agent identifies errors and self-corrects
+5. **Decision Tree Patterns**: Key decision points in the solving process
 
 Provide your analysis in a structured format:
+- **问题类型 (Problem Type)**: A concise problem type label for this experience
 - **Effective Reasoning Workflows**: Step-by-step strategies that led to correct answers
 - **Failed Reasoning Patterns**: Reasoning approaches that led to wrong answers
 - **Tool Usage Recommendations**: When search/research should be invoked during reasoning
@@ -166,6 +188,11 @@ Please extract SOP system-level experience patterns. Focus on:
 1. What step-by-step reasoning workflows led to correct solutions?
 2. How did the agent use tools (search/research) during reasoning?
 3. What reusable standard operating procedures can be derived?
+
+IMPORTANT: You MUST start your response with a problem type classification line in exactly the following format:
+**问题类型 (Problem Type):** <concise problem type label>
+
+For example: **问题类型 (Problem Type):** 多步算术推理
 
 Keep your analysis concise and actionable.
 """
@@ -191,6 +218,29 @@ class QABenchSummaryAgent:
             api_key=api_key,
         )
         self.model = model
+
+    @staticmethod
+    def _parse_problem_type(text: str) -> Tuple[str, str]:
+        """Extract problem_type from LLM response text.
+
+        Looks for a line like:
+            **问题类型 (Problem Type):** <label>
+        at the beginning of the response.
+
+        Returns:
+            (problem_type, original_text) — the label and the full text
+            (the text is kept intact so the summary remains self-contained).
+        """
+        pattern = (
+            r"\*{0,2}(?:问题类型|Problem Type)[\s(（]*"
+            r"(?:Problem Type|问题类型)?[)）]?\*{0,2}"
+            r"[：:\s]*(.+?)(?:\n|$)"
+        )
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            problem_type = match.group(1).strip().strip("*").strip()
+            return problem_type, text
+        return "", text
 
     def _format_runs(
         self, runs: List[Dict[str, Any]], include_stack: bool = True
@@ -280,10 +330,13 @@ class QABenchSummaryAgent:
         except Exception as e:
             summary = f"Summary generation failed: {e}"
 
+        problem_type, summary = self._parse_problem_type(summary)
+
         return {
             "success_count": len(success_runs),
             "failure_count": len(failure_runs),
             "experience_type": experience_type,
+            "problem_type": problem_type,
             "summary": summary,
         }
 
@@ -318,7 +371,7 @@ class QABenchSummaryAgent:
         self,
         qa_result: Dict[str, Any],
         run: Dict[str, Any],
-    ) -> str:
+    ) -> Dict[str, str]:
         """
         Generate a summary for a single run.
 
@@ -328,7 +381,7 @@ class QABenchSummaryAgent:
                  memory_stack_log.
 
         Returns:
-            Summary string for this specific run.
+            Dict with "summary" and "problem_type" keys.
         """
         question = qa_result.get("question", "")
         ground_truth = qa_result.get("ground_truth", "")
@@ -366,13 +419,18 @@ class QABenchSummaryAgent:
         except Exception as e:
             summary = f"Per-run summary generation failed: {e}"
 
-        return summary
+        problem_type, summary = self._parse_problem_type(summary)
+
+        return {
+            "summary": summary,
+            "problem_type": problem_type,
+        }
 
     def summarize_all_runs(
         self,
         results: List[Dict[str, Any]],
         concurrency: int = 1,
-    ) -> Dict[str, str]:
+    ) -> Dict[str, Dict[str, str]]:
         """
         Generate per-run summaries for all runs across all samples.
 
@@ -381,7 +439,8 @@ class QABenchSummaryAgent:
             concurrency: Number of parallel threads.
 
         Returns:
-            Dict mapping "{sample_id}_run_{run_id}" -> summary string.
+            Dict mapping "{sample_id}_run_{run_id}" -> dict with
+            "summary" and "problem_type" keys.
         """
         work_items = []
         for qa_result in results:
@@ -393,7 +452,7 @@ class QABenchSummaryAgent:
 
         total = len(work_items)
         print(f"Generating per-run summaries for {total} runs...")
-        run_summaries: Dict[str, str] = {}
+        run_summaries: Dict[str, Dict[str, str]] = {}
 
         def _do_one(item):
             key, qa_result, run = item
@@ -423,7 +482,10 @@ class QABenchSummaryAgent:
                         print(f"  [{done}/{total}] {key}")
                     except Exception as e:
                         key = future_to_key[future]
-                        run_summaries[key] = f"Per-run summary failed: {e}"
+                        run_summaries[key] = {
+                            "summary": f"Per-run summary failed: {e}",
+                            "problem_type": "",
+                        }
                         print(f"  [{done}/{total}] {key} FAILED: {e}")
 
         return run_summaries

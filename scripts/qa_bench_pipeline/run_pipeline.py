@@ -97,6 +97,7 @@ def build_experience_data(
             "sample_id": sample_id,
             "dataset": dataset,
             "experience_type": experience_type,
+            "problem_type": summary_info.get("problem_type", ""),
             "question": result["question"],
             "ground_truth": result["ground_truth"],
             "ground_truth_aliases": result.get("ground_truth_aliases", []),
@@ -211,11 +212,19 @@ def build_experience_data_per_run(
             stack_log = run.get("memory_stack_log", [])
             reasoning = _extract_run_reasoning(stack_log)
 
-            # Prefer per-run summary; fall back to sample-level summary
+            # Prefer per-run summary; fall back to sample-level summary.
+            # per_run_summaries values are dicts with "summary" and
+            # "problem_type" keys; sample_summary is a plain string.
+            run_summary = sample_summary
+            run_problem_type = summary_map.get(sample_id, {}).get("problem_type", "")
             if per_run_summaries and run_key in per_run_summaries:
-                run_summary = per_run_summaries[run_key]
-            else:
-                run_summary = sample_summary
+                per_run_info = per_run_summaries[run_key]
+                if isinstance(per_run_info, dict):
+                    run_summary = per_run_info.get("summary", "")
+                    run_problem_type = per_run_info.get("problem_type", "")
+                else:
+                    # Backward compat: old format stored plain strings
+                    run_summary = per_run_info
 
             entry = {
                 "sample_id": run_key,
@@ -223,6 +232,7 @@ def build_experience_data_per_run(
                 "run_id": run_id,
                 "dataset": dataset,
                 "experience_type": experience_type,
+                "problem_type": run_problem_type,
                 "question": question,
                 "ground_truth": ground_truth,
                 "ground_truth_aliases": ground_truth_aliases,
