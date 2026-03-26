@@ -1,7 +1,8 @@
 import json
 import os
 import random
-from typing import List, Dict, Any, Optional
+import re
+from typing import List, Dict, Any, Optional, Tuple
 
 # LoCoMo Category 5 = 对抗性问题（adversarial）：答案不在对话中，
 # 模型应回答 "no information available" 或 "not mentioned"。
@@ -16,12 +17,192 @@ def load_locomo_data(data_path: str) -> List[Dict[str, Any]]:
     return data
 
 
+def parse_evidence_ref(ref: str) -> Tuple[int, int]:
+    """Parse evidence reference like 'D1:3' into (session_num, dialog_num).
+
+    Returns (-1, -1) if the reference cannot be parsed.
+    """
+    match = re.match(r"D(\d+):(\d+)", ref)
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    return -1, -1
+
+
+def _build_dia_id_index(
+    conversation: Dict[str, Any],
+) -> Dict[str, Dict[str, Any]]:
+    """Build a mapping from dia_id (e.g. 'D1:3') to its dialog dict + session info."""
+    index: Dict[str, Dict[str, Any]] = {}
+    session_keys = sorted(
+        [
+            k
+            for k in conversation.keys()
+            if k.startswith("session_") and "date_time" not in k
+        ],
+        key=lambda x: int(x.split("_")[1]),
+    )
+    for session_key in session_keys:
+        session_num = session_key.split("_")[1]
+        date_time_key = f"session_{session_num}_date_time"
+        date_time = conversation.get(date_time_key, "Unknown date")
+        dialogs = conversation[session_key]
+        if not isinstance(dialogs, list):
+            continue
+        for dialog in dialogs:
+            dia_id = dialog.get("dia_id", "")
+            if dia_id:
+                index[dia_id] = {
+                    **dialog,
+                    "session_num": int(session_num),
+                    "session_date_time": date_time,
+                }
+    return index
+
+
+def extract_evidence_snippets(
+    conversation: Dict[str, Any],
+    evidence_refs: List[str],
+    context_window: int = 1,
+) -> List[Dict[str, Any]]:
+    """Extract dialogue snippets for the given evidence references.
+
+    For each evidence ref (e.g. 'D1:3'), returns the matching dialog turn
+    together with ``context_window`` turns before and after it so the
+    snippet has enough surrounding context.
+
+    Returns a list of dicts, each containing:
+      - dia_id, speaker, text, blip_caption (from the evidence turn)
+      - session_num, session_date_time
+      - context_before / context_after: neighbouring dialog turns
+    """
+    dia_index = _build_dia_id_index(conversation)
+
+    # Also build per-session ordered lists for context lookup
+    session_dialogs: Dict[int, List[Dict[str, Any]]] = {}
+    session_keys = sorted(
+        [
+            k
+            for k in conversation.keys()
+            if k.startswith("session_") and "date_time" not in k
+        ],
+        key=lambda x: int(x.split("_")[1]),
+    )
+    for session_key in session_keys:
+        snum = int(session_key.split("_")[1])
+        dialogs = conversation[session_key]
+        if isinstance(dialogs, list):
+            session_dialogs[snum] = dialogs
+
+    snippets: List[Dict[str, Any]] = []
+    seen_ids: set = set()
+
+    for ref in evidence_refs:
+        if ref in seen_ids:
+            continue
+        seen_ids.add(ref)
+
+        info = dia_index.get(ref)
+        if info is None:
+            continue
+
+        snum = info["session_num"]
+        dialogs_in_session = session_dialogs.get(snum, [])
+
+        # Find position of the evidence turn in its session
+        pos = -1
+        for i, d in enumerate(dialogs_in_session):
+            if d.get("dia_id") == ref:
+                pos = i
+                break
+
+        ctx_before = []
+        ctx_after = []
+        if pos >= 0:
+            start = max(0, pos - context_window)
+            end = min(len(dialogs_in_session), pos + context_window + 1)
+            ctx_before = [
+                {
+                    "dia_id": d.get("dia_id", ""),
+                    "speaker": d.get("speaker", ""),
+                    "text": d.get("text", ""),
+                }
+                for d in dialogs_in_session[start:pos]
+            ]
+            ctx_after = [
+                {
+                    "dia_id": d.get("dia_id", ""),
+                    "speaker": d.get("speaker", ""),
+                    "text": d.get("text", ""),
+                }
+                for d in dialogs_in_session[pos + 1 : end]
+            ]
+
+        snippets.append(
+            {
+                "dia_id": ref,
+                "speaker": info.get("speaker", ""),
+                "text": info.get("text", ""),
+                "blip_caption": info.get("blip_caption", ""),
+                "session_num": snum,
+                "session_date_time": info.get("session_date_time", ""),
+                "context_before": ctx_before,
+                "context_after": ctx_after,
+            }
+        )
+
+    return snippets
+
+
+def get_evidence_session_context(
+    conv_data: Dict[str, Any],
+    evidence_refs: List[str],
+) -> Dict[str, Any]:
+    """Collect session-level context (observation, summary, events) for sessions
+    referenced by the evidence.
+
+    Returns a dict keyed by session number with observation, summary, and events.
+    """
+    observation = conv_data.get("observation", {})
+    session_summary = conv_data.get("session_summary", {})
+    event_summary = conv_data.get("event_summary", {})
+
+    session_nums: set = set()
+    for ref in evidence_refs:
+        snum, _ = parse_evidence_ref(ref)
+        if snum > 0:
+            session_nums.add(snum)
+
+    context: Dict[str, Any] = {}
+    for snum in sorted(session_nums):
+        entry: Dict[str, Any] = {"session_num": snum}
+
+        obs_key = f"session_{snum}_observation"
+        if obs_key in observation:
+            entry["observation"] = observation[obs_key]
+
+        sum_key = f"session_{snum}_summary"
+        if sum_key in session_summary:
+            entry["summary"] = session_summary[sum_key]
+
+        evt_key = f"events_session_{snum}"
+        if evt_key in event_summary:
+            entry["events"] = event_summary[evt_key]
+
+        context[str(snum)] = entry
+
+    return context
+
+
 def format_conversation_history(conversation: Dict[str, Any]) -> str:
     speaker_a = conversation.get("speaker_a", "Speaker A")
     speaker_b = conversation.get("speaker_b", "Speaker B")
 
     session_keys = sorted(
-        [k for k in conversation.keys() if k.startswith("session_") and "date_time" not in k],
+        [
+            k
+            for k in conversation.keys()
+            if k.startswith("session_") and "date_time" not in k
+        ],
         key=lambda x: int(x.split("_")[1]),
     )
 
@@ -103,6 +284,18 @@ def extract_qa_samples(
                     answer = ""
                 answer = str(answer)
 
+            evidence_refs = qa.get("evidence", [])
+
+            # Extract the actual dialogue snippets for each evidence reference
+            evidence_snippets = extract_evidence_snippets(
+                conversation, evidence_refs, context_window=1
+            )
+
+            # Collect session-level context for evidence sessions
+            evidence_session_context = get_evidence_session_context(
+                conv_data, evidence_refs
+            )
+
             sample = {
                 "sample_id": sample_id,
                 "qa_index": qa_idx,
@@ -111,12 +304,18 @@ def extract_qa_samples(
                 "question": question,
                 "ground_truth": answer,
                 "adversarial_answer": adversarial_answer if category == 5 else "",
-                "evidence": qa.get("evidence", []),
+                "evidence": evidence_refs,
+                "evidence_snippets": evidence_snippets,
+                "evidence_session_context": evidence_session_context,
                 "metadata": {
                     "speaker_a": conversation.get("speaker_a", ""),
                     "speaker_b": conversation.get("speaker_b", ""),
                     "total_sessions": len(
-                        [k for k in conversation.keys() if k.startswith("session_") and "date_time" not in k]
+                        [
+                            k
+                            for k in conversation.keys()
+                            if k.startswith("session_") and "date_time" not in k
+                        ]
                     ),
                     "total_qa": len(qa_list),
                 },
@@ -128,6 +327,33 @@ def extract_qa_samples(
                 break
 
     return samples
+
+
+def format_evidence_text(sample: Dict[str, Any]) -> str:
+    """Format evidence snippets into a human-readable text block.
+
+    This produces a concise representation of only the evidence-relevant
+    dialogue turns (with surrounding context) instead of the full history.
+    """
+    snippets = sample.get("evidence_snippets", [])
+    if not snippets:
+        return ""
+
+    parts: List[str] = []
+    for snip in snippets:
+        header = f"Session {snip['session_num']} ({snip['session_date_time']}):"
+        lines = []
+        for ctx in snip.get("context_before", []):
+            lines.append(f"  [{ctx['dia_id']}] {ctx['speaker']}: {ctx['text']}")
+        main_line = f"  [{snip['dia_id']}] {snip['speaker']}: {snip['text']}"
+        if snip.get("blip_caption"):
+            main_line += f" [shared image: {snip['blip_caption']}]"
+        lines.append(f"  >> {main_line.strip()}")
+        for ctx in snip.get("context_after", []):
+            lines.append(f"  [{ctx['dia_id']}] {ctx['speaker']}: {ctx['text']}")
+        parts.append(header + "\n" + "\n".join(lines))
+
+    return "\n\n".join(parts)
 
 
 def build_user_query(sample: Dict[str, Any]) -> str:
@@ -156,13 +382,17 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Load and preprocess LoCoMo data")
-    parser.add_argument("--data-path", type=str, required=True, help="Path to locomo10.json")
+    parser.add_argument(
+        "--data-path", type=str, required=True, help="Path to locomo10.json"
+    )
     parser.add_argument("--output-path", type=str, default="./data/locomo_samples.json")
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-per-conv", type=int, default=None)
     args = parser.parse_args()
 
     data = load_locomo_data(args.data_path)
-    samples = extract_qa_samples(data, categories=args.categories, max_samples_per_conversation=args.max_per_conv)
+    samples = extract_qa_samples(
+        data, categories=args.categories, max_samples_per_conversation=args.max_per_conv
+    )
     save_samples(samples, args.output_path)
     print(f"Extracted {len(samples)} QA samples, saved to {args.output_path}")
