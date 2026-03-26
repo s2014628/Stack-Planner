@@ -16,7 +16,6 @@ from scripts.locomo_pipeline.run_benchmark import run_benchmark_batch
 from scripts.locomo_pipeline.evaluator import evaluate_runs
 from scripts.locomo_pipeline.summary_agent import SummaryAgent
 
-
 DEFAULT_LOCOMO_DATA = os.path.join(
     os.path.dirname(__file__), "..", "..", "..", "locomo", "data", "locomo10.json"
 )
@@ -31,11 +30,25 @@ DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
 def build_experience_data(
     evaluated_results: list,
     summaries: list,
+    samples: list = None,
+    experiences: list = None,
 ) -> list:
     summary_map = {}
     for s in summaries:
         key = f"{s['sample_id']}_{s['qa_index']}"
         summary_map[key] = s
+
+    experience_map = {}
+    if experiences:
+        for exp in experiences:
+            key = f"{exp['sample_id']}_{exp['qa_index']}"
+            experience_map[key] = exp
+
+    sample_map = {}
+    if samples:
+        for s in samples:
+            key = f"{s['sample_id']}_{s['qa_index']}"
+            sample_map[key] = s
 
     experience_data = []
     for result in evaluated_results:
@@ -44,29 +57,48 @@ def build_experience_data(
         key = f"{sample_id}_{qa_index}"
 
         summary_info = summary_map.get(key, {})
+        experience_info = experience_map.get(key, {})
+        sample_info = sample_map.get(key, {})
 
         entry = {
             "sample_id": sample_id,
             "qa_index": qa_index,
             "category": result["category"],
-            "history": result.get("history", ""),
             "question": result["question"],
             "ground_truth": result["ground_truth"],
-            "runs": [],
+            # Evidence: the raw references and extracted dialogue snippets
+            "evidence_refs": sample_info.get("evidence", []),
+            "evidence_snippets": sample_info.get("evidence_snippets", []),
+            "evidence_session_context": sample_info.get("evidence_session_context", {}),
+            # Experience: structured analysis from the LLM
+            "evidence_analysis": experience_info.get("evidence_analysis", ""),
+            "effective_strategy": experience_info.get("effective_strategy", ""),
+            "common_mistakes": experience_info.get("common_mistakes", ""),
+            "experience_note": experience_info.get("experience_note", ""),
+            # Run statistics
+            "success_count": summary_info.get(
+                "success_count", experience_info.get("success_count", 0)
+            ),
+            "failure_count": summary_info.get(
+                "failure_count", experience_info.get("failure_count", 0)
+            ),
             "success_summary": summary_info.get("summary", ""),
-            "success_count": summary_info.get("success_count", 0),
-            "failure_count": summary_info.get("failure_count", 0),
+            "runs": [],
+            # Keep full history for reference (can be dropped to save space)
+            "history": result.get("history", ""),
         }
 
         for run in result.get("runs", []):
-            entry["runs"].append({
-                "run_id": run["run_id"],
-                "prediction": run.get("prediction", ""),
-                "f1_score": run.get("f1_score", 0.0),
-                "success": run.get("success", False),
-                "memory_stack_log": run.get("memory_stack_log", []),
-                "elapsed_seconds": run.get("elapsed_seconds", 0),
-            })
+            entry["runs"].append(
+                {
+                    "run_id": run["run_id"],
+                    "prediction": run.get("prediction", ""),
+                    "f1_score": run.get("f1_score", 0.0),
+                    "success": run.get("success", False),
+                    "memory_stack_log": run.get("memory_stack_log", []),
+                    "elapsed_seconds": run.get("elapsed_seconds", 0),
+                }
+            )
 
         experience_data.append(entry)
 
@@ -81,17 +113,31 @@ def main():
         default=DEFAULT_LOCOMO_DATA,
         help="Path to locomo10.json",
     )
-    parser.add_argument("--output-dir", type=str, default="./results/locomo",
-                        help="Base output directory. A timestamped subdirectory will be created for each run.")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="./results/locomo",
+        help="Base output directory. A timestamped subdirectory will be created for each run.",
+    )
     parser.add_argument("--num-runs", type=int, default=10)
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-per-conv", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
-    parser.add_argument("--concurrency", type=int, default=1,
-                        help="Number of samples to process in parallel (default: 1). Uses multiprocessing.")
-    parser.add_argument("--skip-benchmark", action="store_true", help="Skip benchmark run, use existing results")
-    parser.add_argument("--skip-summary", action="store_true", help="Skip summary generation")
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=1,
+        help="Number of samples to process in parallel (default: 1). Uses multiprocessing.",
+    )
+    parser.add_argument(
+        "--skip-benchmark",
+        action="store_true",
+        help="Skip benchmark run, use existing results",
+    )
+    parser.add_argument(
+        "--skip-summary", action="store_true", help="Skip summary generation"
+    )
     parser.add_argument(
         "--summary-base-url",
         type=str,
@@ -185,7 +231,9 @@ def main():
             api_key=args.summary_api_key,
             model=args.summary_model,
         )
-        summaries = summary_agent.summarize_batch(benchmark_results, concurrency=args.concurrency)
+        summaries = summary_agent.summarize_batch(
+            benchmark_results, concurrency=args.concurrency
+        )
 
         summaries_file = os.path.join(run_dir, "summaries.json")
         with open(summaries_file, "w", encoding="utf-8") as f:
@@ -197,8 +245,33 @@ def main():
             with open(summaries_file, "r", encoding="utf-8") as f:
                 summaries = json.load(f)
 
+    # Step 4.5: Generate structured per-question experience notes
+    experiences = []
+    if not args.skip_summary:
+        print("\n[Step 4.5] Generating per-question experience notes...")
+        if not summary_agent:
+            summary_agent = SummaryAgent(
+                base_url=args.summary_base_url,
+                api_key=args.summary_api_key,
+                model=args.summary_model,
+            )
+        experiences = summary_agent.generate_experience_batch(
+            benchmark_results, samples, concurrency=args.concurrency
+        )
+
+        experiences_file = os.path.join(run_dir, "experiences.json")
+        with open(experiences_file, "w", encoding="utf-8") as f:
+            json.dump(experiences, f, ensure_ascii=False, indent=2)
+    else:
+        experiences_file = os.path.join(run_dir, "experiences.json")
+        if os.path.exists(experiences_file):
+            with open(experiences_file, "r", encoding="utf-8") as f:
+                experiences = json.load(f)
+
     print("\n[Step 5] Building final experience data...")
-    experience_data = build_experience_data(benchmark_results, summaries)
+    experience_data = build_experience_data(
+        benchmark_results, summaries, samples=samples, experiences=experiences
+    )
 
     output_file = os.path.join(run_dir, "experience_data.json")
     with open(output_file, "w", encoding="utf-8") as f:
