@@ -37,6 +37,40 @@ Your output MUST be a JSON object with exactly these fields:
 IMPORTANT: Respond ONLY with the JSON object, no markdown fences, no extra text.
 """
 
+# ─── Per-Run Experience Summary Prompt (from real execution traces) ────────
+
+PER_RUN_SYSTEM_PROMPT = """You are an expert at analyzing a single execution trace of a multi-agent system for long-context conversation question-answering tasks.
+
+Your task is to analyze ONE specific run and extract **experience from the real execution trace**.
+The execution trace is the memory_stack_log which records the agent's actual think/reflect/summarize/finish decision steps.
+
+Focus on:
+1. **Reasoning Workflow**: The step-by-step reasoning the agent followed in this run
+2. **Evidence Retrieval**: How the agent identified and used relevant conversation fragments
+3. **Decision Quality**: Whether the agent's think/reflect/finish decisions were appropriate
+4. **Answer Extraction**: How the agent arrived at the final answer from the conversation context
+
+Provide a concise summary of this single run's experience. Do NOT compare with other runs."""
+
+PER_RUN_USER_TEMPLATE = """Analyze the following SINGLE execution run for a conversation QA task.
+
+Question: {question}
+Ground Truth Answer: {ground_truth}
+Category: {category}
+
+## Run {run_id} (F1: {f1_score}, Success: {success})
+Prediction: {prediction}
+
+{run_trace}
+
+Please summarize the experience from this single run:
+1. What reasoning workflow did the agent follow?
+2. Why did it succeed or fail?
+3. What reusable experience can be extracted from this specific run?
+
+Keep your summary concise (200-500 words)."""
+
+
 SUMMARY_USER_TEMPLATE = """Analyze the following execution runs for a question-answering task.
 
 Question: {question}
@@ -330,6 +364,114 @@ class SummaryAgent:
                     print(f"Summary failed for index {idx}: {e}")
 
         return summaries
+
+    def summarize_single_run(
+        self,
+        qa_result: Dict[str, Any],
+        run: Dict[str, Any],
+    ) -> str:
+        """Generate a summary for a single run from its execution trace.
+
+        Args:
+            qa_result: The parent sample containing question, ground_truth, etc.
+            run: A single run dict with run_id, prediction, f1_score, success,
+                 memory_stack_log.
+
+        Returns:
+            Summary string for this specific run.
+        """
+        question = qa_result.get("question", "")
+        ground_truth = qa_result.get("ground_truth", "")
+        category = qa_result.get("category", 0)
+
+        run_trace = self._format_runs([run], include_stack=True)
+
+        user_message = PER_RUN_USER_TEMPLATE.format(
+            question=question[:2000],
+            ground_truth=ground_truth,
+            category=category,
+            run_id=run.get("run_id", "?"),
+            f1_score=run.get("f1_score", "N/A"),
+            success=run.get("success", False),
+            prediction=run.get("prediction", "N/A"),
+            run_trace=run_trace,
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": PER_RUN_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=0.3,
+                max_tokens=1000,
+            )
+            summary = response.choices[0].message.content.strip()
+        except Exception as e:
+            summary = f"Per-run summary generation failed: {e}"
+
+        return summary
+
+    def summarize_all_runs(
+        self,
+        results: List[Dict[str, Any]],
+        concurrency: int = 1,
+    ) -> Dict[str, str]:
+        """Generate per-run summaries for all runs across all samples.
+
+        Args:
+            results: List of benchmark results with evaluated runs.
+            concurrency: Number of parallel threads.
+
+        Returns:
+            Dict mapping "{sample_id}_{qa_index}_run_{run_id}" -> summary string.
+        """
+        work_items = []
+        for qa_result in results:
+            sample_id = qa_result.get("sample_id", "")
+            qa_index = qa_result.get("qa_index", 0)
+            for run in qa_result.get("runs", []):
+                run_id = run.get("run_id", "?")
+                key = f"{sample_id}_{qa_index}_run_{run_id}"
+                work_items.append((key, qa_result, run))
+
+        total = len(work_items)
+        print(f"Generating per-run summaries for {total} runs...")
+        run_summaries: Dict[str, str] = {}
+
+        def _do_one(item):
+            key, qa_result, run = item
+            return key, self.summarize_single_run(qa_result, run)
+
+        if concurrency <= 1:
+            for i, item in enumerate(work_items):
+                key, summary = _do_one(item)
+                run_summaries[key] = summary
+                print(f"  [{i+1}/{total}] {key}")
+        else:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+
+            print(f"  Using {concurrency} threads...")
+            with ThreadPoolExecutor(max_workers=concurrency) as executor:
+                future_to_key = {}
+                for item in work_items:
+                    future = executor.submit(_do_one, item)
+                    future_to_key[future] = item[0]
+
+                done = 0
+                for future in as_completed(future_to_key):
+                    done += 1
+                    try:
+                        key, summary = future.result()
+                        run_summaries[key] = summary
+                        print(f"  [{done}/{total}] {key}")
+                    except Exception as e:
+                        key = future_to_key[future]
+                        run_summaries[key] = f"Per-run summary failed: {e}"
+                        print(f"  [{done}/{total}] {key} FAILED: {e}")
+
+        return run_summaries
 
     def generate_experience_batch(
         self,

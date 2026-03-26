@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 import sys
 import argparse
 from datetime import datetime
@@ -25,6 +26,127 @@ DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
 # Old OpenRouter config:
 # DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
 # DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
+
+
+def _extract_run_reasoning(memory_stack_log: list) -> str:
+    """Extract reasoning text from a single run's memory_stack_log.
+
+    Parses each entry's content (JSON or plain text) and collects
+    reasoning fields into a single joined string.
+    """
+    parts = []
+    for entry in memory_stack_log:
+        content = entry.get("content", "")
+        if not content:
+            continue
+        raw = content.strip()
+        raw = re.sub(r"^```json\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+        try:
+            obj = json.loads(raw)
+            reasoning = obj.get("reasoning", "")
+            if reasoning:
+                parts.append(reasoning.strip())
+        except (json.JSONDecodeError, AttributeError):
+            parts.append(raw[:500])
+    return " ".join(parts)
+
+
+def build_experience_data_per_run(
+    evaluated_results: list,
+    summaries: list | None = None,
+    samples: list | None = None,
+    per_run_summaries: dict | None = None,
+) -> list:
+    """Build flat experience data where each run is an independent entry.
+
+    Instead of grouping runs under their parent sample, this function
+    produces one experience entry per run.  This increases the number of
+    data points (N samples * M runs) and gives each entry a unique
+    reasoning chain, making it better suited for embedding / codebook
+    training (RQ-KMeans -> LlamaFactory pipeline).
+
+    Args:
+        evaluated_results: List of evaluated benchmark results (each
+            contains ``runs`` with ``memory_stack_log``).
+        summaries: Optional list of per-sample summaries.  When provided
+            and ``per_run_summaries`` is not available, the sample-level
+            summary is used as fallback.
+        samples: Optional list of prepared samples for evidence lookup.
+        per_run_summaries: Optional dict mapping
+            ``"{sample_id}_{qa_index}_run_{run_id}"`` to a run-specific
+            summary string.  When provided, each run entry gets its own
+            dedicated summary instead of sharing the sample-level one.
+
+    Returns:
+        Flat list of experience dicts, each with:
+        - sample_id: ``{orig_sample_id}_{qa_index}_run_{run_id}``
+        - original_sample_id, qa_index, run_id
+        - category, question, ground_truth
+        - reasoning: extracted reasoning chain for *this* run only
+        - prediction, f1_score, success
+        - memory_stack_log: the raw log for this run
+        - experience_summary: per-run summary (preferred) or per-sample
+          summary (fallback)
+    """
+    summary_map = {}
+    if summaries:
+        for s in summaries:
+            key = f"{s['sample_id']}_{s['qa_index']}"
+            summary_map[key] = s
+
+    sample_map = {}
+    if samples:
+        for s in samples:
+            key = f"{s['sample_id']}_{s['qa_index']}"
+            sample_map[key] = s
+
+    per_run_entries: list = []
+
+    for result in evaluated_results:
+        sample_id = result["sample_id"]
+        qa_index = result["qa_index"]
+        category = result["category"]
+        question = result["question"]
+        ground_truth = result["ground_truth"]
+        key = f"{sample_id}_{qa_index}"
+        sample_summary = summary_map.get(key, {}).get("summary", "")
+        sample_info = sample_map.get(key, {})
+
+        for run in result.get("runs", []):
+            run_id = run["run_id"]
+            run_key = f"{sample_id}_{qa_index}_run_{run_id}"
+            stack_log = run.get("memory_stack_log", [])
+            reasoning = _extract_run_reasoning(stack_log)
+
+            # Prefer per-run summary; fall back to sample-level summary
+            if per_run_summaries and run_key in per_run_summaries:
+                run_summary = per_run_summaries[run_key]
+            else:
+                run_summary = sample_summary
+
+            entry = {
+                "sample_id": run_key,
+                "original_sample_id": sample_id,
+                "qa_index": qa_index,
+                "run_id": run_id,
+                "category": category,
+                "question": question,
+                "ground_truth": ground_truth,
+                "reasoning": reasoning,
+                "prediction": run.get("prediction", ""),
+                "f1_score": run.get("f1_score", 0.0),
+                "success": run.get("success", False),
+                "memory_stack_log": stack_log,
+                "elapsed_seconds": run.get("elapsed_seconds", 0),
+                "experience_summary": run_summary,
+                # Evidence from sample
+                "evidence_refs": sample_info.get("evidence", []),
+                "evidence_snippets": sample_info.get("evidence_snippets", []),
+            }
+            per_run_entries.append(entry)
+
+    return per_run_entries
 
 
 def build_experience_data(
@@ -137,6 +259,24 @@ def main():
     )
     parser.add_argument(
         "--skip-summary", action="store_true", help="Skip summary generation"
+    )
+    parser.add_argument(
+        "--per-run",
+        action="store_true",
+        help=(
+            "Also generate per-run flat experience data where each run is "
+            "an independent entry (saves per_run_experiences.json). "
+            "This is useful for RQ-KMeans codebook training."
+        ),
+    )
+    parser.add_argument(
+        "--per-run-summary",
+        action="store_true",
+        help=(
+            "Generate a dedicated summary for each individual run "
+            "(instead of sharing the sample-level summary). "
+            "Implies --per-run. Saves per_run_summaries.json."
+        ),
     )
     parser.add_argument(
         "--summary-base-url",
@@ -268,6 +408,10 @@ def main():
             with open(experiences_file, "r", encoding="utf-8") as f:
                 experiences = json.load(f)
 
+    # --per-run-summary implies --per-run
+    if args.per_run_summary:
+        args.per_run = True
+
     print("\n[Step 5] Building final experience data...")
     experience_data = build_experience_data(
         benchmark_results, summaries, samples=samples, experiences=experiences
@@ -277,6 +421,57 @@ def main():
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(experience_data, f, ensure_ascii=False, indent=2)
 
+    # Step 6: Build per-run flat experience data (for RQ-KMeans pipeline)
+    per_run_experiences = []
+    if args.per_run:
+        run_summaries_map = None
+
+        # Generate per-run summaries from real execution traces
+        if args.per_run_summary and not args.skip_summary:
+            print(
+                "\n[Step 6] Generating per-run experience summaries from execution traces..."
+            )
+            if not summary_agent:
+                summary_agent = SummaryAgent(
+                    base_url=args.summary_base_url,
+                    api_key=args.summary_api_key,
+                    model=args.summary_model,
+                )
+            run_summaries_map = summary_agent.summarize_all_runs(
+                benchmark_results, concurrency=args.concurrency
+            )
+            run_summaries_file = os.path.join(run_dir, "per_run_summaries.json")
+            with open(run_summaries_file, "w", encoding="utf-8") as f:
+                json.dump(run_summaries_map, f, ensure_ascii=False, indent=2)
+            print(
+                f"    Saved per_run_summaries.json "
+                f"({len(run_summaries_map)} run-level summaries)"
+            )
+        elif args.per_run_summary and args.skip_summary:
+            # Try to load existing per-run summaries
+            run_summaries_file = os.path.join(run_dir, "per_run_summaries.json")
+            if os.path.exists(run_summaries_file):
+                with open(run_summaries_file, "r", encoding="utf-8") as f:
+                    run_summaries_map = json.load(f)
+                print(
+                    f"    Loaded existing {run_summaries_file} "
+                    f"({len(run_summaries_map)} entries, --skip-summary)"
+                )
+
+        per_run_experiences = build_experience_data_per_run(
+            benchmark_results,
+            summaries or None,
+            samples=samples,
+            per_run_summaries=run_summaries_map,
+        )
+        per_run_file = os.path.join(run_dir, "per_run_experiences.json")
+        with open(per_run_file, "w", encoding="utf-8") as f:
+            json.dump(per_run_experiences, f, ensure_ascii=False, indent=2)
+        print(
+            f"    Saved per_run_experiences.json "
+            f"({len(per_run_experiences)} run-level entries)"
+        )
+
     print("\n" + "=" * 60)
     print("Pipeline Complete!")
     print(f"Experience data saved to: {output_file}")
@@ -285,6 +480,8 @@ def main():
     total_failure = sum(e.get("failure_count", 0) for e in experience_data)
     print(f"Total success runs: {total_success}")
     print(f"Total failure runs: {total_failure}")
+    if per_run_experiences:
+        print(f"Per-run experience entries: {len(per_run_experiences)}")
     print("=" * 60)
 
 

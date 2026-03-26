@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.utils.logger import logger
 
-
 RUNS_PER_QA = 10
 TEMPERATURE = 0.8
 DEFAULT_CONCURRENCY = 1
@@ -23,22 +22,23 @@ def set_temperature(temperature: float):
 
 def _clear_llm_cache():
     from src.llms.llm import _llm_cache
+
     _llm_cache.clear()
 
 
 def _init_locomo_agents():
     from src.graph.sp_nodes import init_agents
+
     init_agents("locomo")
 
 
 def _get_locomo_graph():
     from src.graph.builder import locomo_graph
+
     return locomo_graph
 
 
-async def _run_graph(
-    conversation_history: str, question: str, graph
-) -> Dict[str, Any]:
+async def _run_graph(conversation_history: str, question: str, graph) -> Dict[str, Any]:
     # NOTE: 对话历史放在 observations 中（通过系统 prompt 注入），不放在 messages 中。
     # 原因：如果把长对话放进 messages，LLM 会把它当作直接问答任务，
     # 返回自然语言答案而非 Decision JSON，导致 make_decision 解析失败。
@@ -66,15 +66,17 @@ async def _run_graph(
         "configurable": {
             "thread_id": f"locomo_{datetime.now().timestamp()}",
             "graph_format": "locomo",
-            "max_plan_iterations": 1,
-            "max_step_num": 3,
+            "max_plan_iterations": 2,
+            "max_step_num": 6,
             "mcp_settings": {},
         },
         "recursion_limit": 30,
     }
 
     final_state = None
-    async for s in graph.astream(input=initial_state, config=config, stream_mode="values"):
+    async for s in graph.astream(
+        input=initial_state, config=config, stream_mode="values"
+    ):
         if isinstance(s, dict):
             final_state = s
 
@@ -106,9 +108,7 @@ async def run_single_qa(
     sample_id = sample["sample_id"]
     qa_index = sample["qa_index"]
 
-    logger.info(
-        f"Running sample={sample_id}, qa={qa_index}, run={run_id}"
-    )
+    logger.info(f"Running sample={sample_id}, qa={qa_index}, run={run_id}")
 
     start_time = time.time()
     try:
@@ -121,8 +121,11 @@ async def run_single_qa(
         prediction = result.get("prediction", "")
         memory_stack_log = result.get("memory_stack_log", [])
     except Exception as e:
-        logger.error(f"Run failed: sample={sample_id}, qa={qa_index}, run={run_id}: {e}")
+        logger.error(
+            f"Run failed: sample={sample_id}, qa={qa_index}, run={run_id}: {e}"
+        )
         import traceback
+
         logger.error(traceback.format_exc())
         prediction = ""
         memory_stack_log = []
@@ -190,7 +193,9 @@ async def run_benchmark_batch(
         for item in checkpoint_data:
             key = f"{item['sample_id']}_{item['qa_index']}"
             completed[key] = item
-        logger.info(f"Resuming from checkpoint: {len(completed)} samples already completed")
+        logger.info(
+            f"Resuming from checkpoint: {len(completed)} samples already completed"
+        )
 
     all_results = list(completed.values())
 
@@ -240,6 +245,7 @@ async def run_benchmark_batch(
                 except Exception as e:
                     logger.error(f"Sample {key} failed: {e}")
                     import traceback
+
                     logger.error(traceback.format_exc())
                     continue
 
@@ -259,20 +265,30 @@ if __name__ == "__main__":
     import argparse
     from scripts.locomo_pipeline.data_loader import load_locomo_data, extract_qa_samples
 
-    parser = argparse.ArgumentParser(description="Run LoCoMo benchmark on Stack-Planner")
-    parser.add_argument("--data-path", type=str, required=True, help="Path to locomo10.json")
+    parser = argparse.ArgumentParser(
+        description="Run LoCoMo benchmark on Stack-Planner"
+    )
+    parser.add_argument(
+        "--data-path", type=str, required=True, help="Path to locomo10.json"
+    )
     parser.add_argument("--output-dir", type=str, default="./results/locomo")
     parser.add_argument("--num-runs", type=int, default=RUNS_PER_QA)
     parser.add_argument("--temperature", type=float, default=TEMPERATURE)
     parser.add_argument("--categories", type=int, nargs="*", default=None)
     parser.add_argument("--max-samples", type=int, default=None)
     parser.add_argument("--no-resume", action="store_true")
-    parser.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY,
-                        help="Number of samples to process in parallel (default: 1)")
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=DEFAULT_CONCURRENCY,
+        help="Number of samples to process in parallel (default: 1)",
+    )
     args = parser.parse_args()
 
     data = load_locomo_data(args.data_path)
-    samples = extract_qa_samples(data, categories=args.categories, max_samples_per_conversation=args.max_samples)
+    samples = extract_qa_samples(
+        data, categories=args.categories, max_samples_per_conversation=args.max_samples
+    )
     logger.info(f"Loaded {len(samples)} QA samples")
 
     results = asyncio.run(
