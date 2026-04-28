@@ -20,12 +20,11 @@ DEFAULT_LOCOMO_DATA = os.path.join(
     os.path.dirname(__file__), "..", "..", "..", "locomo", "data", "locomo10.json"
 )
 
-DEFAULT_SUMMARY_BASE_URL = "http://123.57.228.132:8285/api"
-DEFAULT_SUMMARY_MODEL = "deepseek-v3.2-20251201-160k-local"
+DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
 # Old OpenRouter config:
 # DEFAULT_SUMMARY_BASE_URL = "https://openrouter.ai/api/v1"
 # DEFAULT_SUMMARY_MODEL = "deepseek/deepseek-v3.2"
-
 
 def build_experience_data(
     evaluated_results: list,
@@ -146,7 +145,8 @@ def main():
     parser.add_argument(
         "--summary-api-key",
         type=str,
-        default=os.getenv("SUMMARY_API_KEY", "sk-7374e2abda1141ffa4fe8eb01ae582f7"),
+        default=os.getenv("SUMMARY_API_KEY", "").strip(),
+        help="LLM API key (default: SUMMARY_API_KEY env or scripts/locomo_pipeline/.env)",
     )
     parser.add_argument(
         "--summary-model",

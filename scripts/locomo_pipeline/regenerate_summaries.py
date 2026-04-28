@@ -5,8 +5,8 @@
 
 用法:
     python scripts/locomo_pipeline/regenerate_summaries.py \
-        --run-dir results/locomo/run_20260223_002529 \
-        --summary-api-key sk-7374e2abda1141ffa4fe8eb01ae582f7
+        --run-dir results/locomo/run_20260223_002529
+    # 或在 scripts/locomo_pipeline/.env 中设置 SUMMARY_API_KEY，再传 --summary-api-key
 """
 
 import argparse

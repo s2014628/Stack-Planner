@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any, Dict, List
 
 from openai import OpenAI
@@ -83,6 +84,11 @@ class SummaryAgent:
         api_key: str = SUMMARY_API_KEY,
         model: str = SUMMARY_MODEL,
     ):
+        if not (api_key or "").strip():
+            raise ValueError(
+                "SUMMARY_API_KEY is missing. Set it in scripts/locomo_pipeline/.env "
+                "(copy from .env.example) or pass api_key=... to SummaryAgent."
+            )
         self.client = OpenAI(
             base_url=base_url,
             api_key=api_key,

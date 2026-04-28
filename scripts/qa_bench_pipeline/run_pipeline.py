@@ -73,7 +73,8 @@ def build_experience_data(
 
     Args:
         evaluated_results: List of evaluated benchmark results
-        summaries: List of experience summaries
+        summaries: List of experience summaries (may include new structured fields
+            problem_addressed, practice, lessons_learned from the two-stage agent)
 
     Returns:
         Dict with "factual_experiences" and "sop_experiences" lists
@@ -101,11 +102,16 @@ def build_experience_data(
             "question": result["question"],
             "ground_truth": result["ground_truth"],
             "ground_truth_aliases": result.get("ground_truth_aliases", []),
-            "runs": [],
+            # Structured experience fields (two-stage pipeline output)
+            "problem_addressed": summary_info.get("problem_addressed", ""),
+            "practice": summary_info.get("practice", ""),
+            "lessons_learned": summary_info.get("lessons_learned", ""),
+            # Composed human-readable summary (backward compat)
             "experience_summary": summary_info.get("summary", ""),
             "success_count": summary_info.get("success_count", 0),
             "failure_count": summary_info.get("failure_count", 0),
             "metadata": result.get("metadata", {}),
+            "runs": [],
         }
 
         for run in result.get("runs", []):
@@ -414,7 +420,16 @@ async def _run_dataset_pipeline(
         )
         summaries_file = os.path.join(dataset_dir, "summaries.json")
         with open(summaries_file, "w", encoding="utf-8") as f:
-            json.dump(summaries, f, ensure_ascii=False, indent=2)
+            # Strip trajectory_summaries before persisting (saved separately)
+            slim = [{k: v for k, v in s.items() if k != "trajectory_summaries"} for s in summaries]
+            json.dump(slim, f, ensure_ascii=False, indent=2)
+        # Save Stage 1 trajectory summaries as a separate debug/reprocess file
+        traj_file = os.path.join(dataset_dir, "trajectory_summaries.json")
+        with open(traj_file, "w", encoding="utf-8") as f:
+            traj_data = {
+                s["sample_id"]: s.get("trajectory_summaries", []) for s in summaries
+            }
+            json.dump(traj_data, f, ensure_ascii=False, indent=2)
     else:
         summaries_file = os.path.join(dataset_dir, "summaries.json")
         if os.path.exists(summaries_file):

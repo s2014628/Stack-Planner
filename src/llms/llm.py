@@ -127,6 +127,10 @@ def _create_llm_use_conf(llm_type: LLMType, conf: Dict[str, Any]) -> BaseChatMod
         merged_conf["api_base"] = merged_conf.pop("base_url", None)
         return ChatDeepSeek(**merged_conf)
     else:
+        # Qwen3 series defaults to thinking mode; disable it for non-reasoning calls.
+        model_name = merged_conf.get("model", "")
+        if "Qwen3" in model_name or "qwen3" in model_name:
+            merged_conf.setdefault("extra_body", {})["enable_thinking"] = False
         return ChatOpenAI(**merged_conf)
 
 
